@@ -3721,7 +3721,11 @@ function pbNormalizePhoto(src){
   img.onload=function(){
    var W=960,H=640;
    var iw=img.naturalWidth||img.width||4,ih=img.naturalHeight||img.height||3;
-   var s=Math.min(W/iw,H/ih),dw=iw*s,dh=ih*s;
+   // Crop-to-fill (like a phone's "cover" photo grid) rather than shrink-to-fit, so a
+   // portrait shot doesn't end up small with white bars either side -- every tile comes
+   // out exactly W x H either way. Math.max overscales the image so it fully covers the
+   // canvas; centring then lets the canvas edges naturally clip the overhang.
+   var s=Math.max(W/iw,H/ih),dw=iw*s,dh=ih*s;
    var canvas=document.createElement("canvas");
    canvas.width=W;canvas.height=H;
    var g=canvas.getContext("2d");
