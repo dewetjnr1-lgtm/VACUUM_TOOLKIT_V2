@@ -3774,6 +3774,10 @@ function pbSecPhotos(pb,secNorm,id){
  var items=secNorm&&secNorm[id];
  if(items&&items.length)pbPhotoRow(pb,items);
 }
+// A section with only an attached photo and nothing else filled in still counts as
+// "filled in" for the blank-means-left-out rule -- a photo is content too, and should
+// never be silently dropped just because no text field happened to be touched.
+function pbHasPhotos(secNorm,id){return !!(secNorm&&secNorm[id]&&secNorm[id].length);}
 // Measures the footer for this report once, up front, so pbCreate can reserve
 // the right amount of space at the bottom of every page. Letterhead mode gets
 // the full Busch company block; plain mode just a page-number line.
@@ -3829,7 +3833,7 @@ function pbDrawPump(pb,n,secNorm){
   if(lriAny([p+"maxp_n"]))pbPairRow(pb,"Max working pressure (abs)",rUnitVal(p+"maxp_n",p+"maxp_u"));
   pbGap(pb,3);
  }
- if(lriAny([p+"seal_type",p+"seal_cond",p+"seal_drip_before",p+"seal_drip_after",p+"seal_sleeve",p+"seal_adj",p+"seal_notes",p+"brg_type",p+"brg_cond",p+"brg_de_temp",p+"brg_nde_temp",p+"brg_notes"])){
+ if(lriAny([p+"seal_type",p+"seal_cond",p+"seal_drip_before",p+"seal_drip_after",p+"seal_sleeve",p+"seal_adj",p+"seal_notes",p+"brg_type",p+"brg_cond",p+"brg_de_temp",p+"brg_nde_temp",p+"brg_notes"])||pbHasPhotos(secNorm,p+"seals")||pbHasPhotos(secNorm,p+"brg")){
   pbHeaderRow(pb,"Seals & bearings");
   pbPairRow(pb,"Seal type",rSelText(p+"seal_type"),"Seal condition",rSelText(p+"seal_cond"));
   if(lriAny([p+"seal_drip_before",p+"seal_drip_after"]))
@@ -3848,7 +3852,7 @@ function pbDrawPump(pb,n,secNorm){
   pbSecPhotos(pb,secNorm,p+"brg");
   pbGap(pb,3);
  }
- if(lriAny([p+"bore_corr",p+"bore_cav",p+"bore_abr",p+"bore_notes"])){
+ if(lriAny([p+"bore_corr",p+"bore_cav",p+"bore_abr",p+"bore_notes"])||pbHasPhotos(secNorm,p+"bore")){
   var corrSev=lriSevOf(p+"bore_corr"),cavSev=lriSevOf(p+"bore_cav"),abrSev=lriSevOf(p+"bore_abr");
   pbHeaderRow(pb,"Borescope inspection of casing");
   pbPairRow(pb,"Corrosion",rSelText(p+"bore_corr"),"Cavitation damage",rSelText(p+"bore_cav"),
@@ -3858,7 +3862,7 @@ function pbDrawPump(pb,n,secNorm){
   pbSecPhotos(pb,secNorm,p+"bore");
   pbGap(pb,3);
  }
- if(lriAny([p+"chk_rotation",p+"chk_footbolts",p+"chk_guards",p+"chk_strainer",p+"chk_hoses",p+"run_obs"])){
+ if(lriAny([p+"chk_rotation",p+"chk_footbolts",p+"chk_guards",p+"chk_strainer",p+"chk_hoses",p+"run_obs"])||pbHasPhotos(secNorm,p+"gen")){
   pbHeaderRow(pb,"General & installation");
   pbPairRow(pb,"Rotation direction correct",rChkYN(p+"chk_rotation"),"Foot & hold-down bolts tight",rChkYN(p+"chk_footbolts"));
   pbPairRow(pb,"All guards fitted & secure",rChkYN(p+"chk_guards"),"Inlet strainer / screen",rSelText(p+"chk_strainer"));
@@ -3868,12 +3872,12 @@ function pbDrawPump(pb,n,secNorm){
   pbGap(pb,3);
  }
  var tqCount=LRI_TORQ_COUNT[n]||0,tqAnyFilled=false,ti,tqp;
- for(ti=1;ti<=tqCount;ti++){tqp="lri_r"+n+"_tq"+ti+"_";if(lriAny([tqp+"name",tqp+"val",tqp+"cond",tqp+"notes"])){tqAnyFilled=true;break;}}
+ for(ti=1;ti<=tqCount;ti++){tqp="lri_r"+n+"_tq"+ti+"_";if(lriAny([tqp+"name",tqp+"val",tqp+"cond",tqp+"notes"])||pbHasPhotos(secNorm,tqp+"ph")){tqAnyFilled=true;break;}}
  if(tqAnyFilled){
   pbHeaderRow(pb,"Torque settings");
   for(ti=1;ti<=tqCount;ti++){
    tqp="lri_r"+n+"_tq"+ti+"_";
-   if(!lriAny([tqp+"name",tqp+"val",tqp+"cond",tqp+"notes"]))continue;
+   if(!lriAny([tqp+"name",tqp+"val",tqp+"cond",tqp+"notes"])&&!pbHasPhotos(secNorm,tqp+"ph"))continue;
    var tqSev=lriSevOf(tqp+"cond");
    pbPairRow(pb,rv(tqp+"name")||"Torque item",rv(tqp+"val")||"—",
     "Condition",rSelText(tqp+"cond"),null,tqSev<0?null:PB_SEV_RGB[tqSev]);
@@ -3882,7 +3886,7 @@ function pbDrawPump(pb,n,secNorm){
   }
   pbGap(pb,3);
  }
- if(lriAny([p+"drive_type",p+"coup_cond",p+"coup_align",p+"coup_bolts",p+"coup_notes",p+"belt_profile",p+"belt_cond",p+"belt_tension",p+"belt_align",p+"belt_groove",p+"belt_span",p+"belt_defl_before",p+"belt_defl_after",p+"belt_guard",p+"belt_notes"])){
+ if(lriAny([p+"drive_type",p+"coup_cond",p+"coup_align",p+"coup_bolts",p+"coup_notes",p+"belt_profile",p+"belt_cond",p+"belt_tension",p+"belt_align",p+"belt_groove",p+"belt_span",p+"belt_defl_before",p+"belt_defl_after",p+"belt_guard",p+"belt_notes"])||pbHasPhotos(secNorm,p+"drive")){
   var driveTxt=rSelText(p+"drive_type");
   pbHeaderRow(pb,"Drive"+(driveTxt?": "+driveTxt:""));
   if(lriAny([p+"coup_cond",p+"coup_align",p+"coup_bolts",p+"coup_notes"])){
@@ -3901,7 +3905,7 @@ function pbDrawPump(pb,n,secNorm){
   pbSecPhotos(pb,secNorm,p+"drive");
   pbGap(pb,3);
  }
- if(lriAny([p+"cooler_system",p+"cooler_cond",p+"cooler_notes",p+"sep_lining",p+"sep_bolts",p+"sep_notes"])){
+ if(lriAny([p+"cooler_system",p+"cooler_cond",p+"cooler_notes",p+"sep_lining",p+"sep_bolts",p+"sep_notes"])||pbHasPhotos(secNorm,p+"cooler")||pbHasPhotos(secNorm,p+"sep")){
   pbHeaderRow(pb,"Seal water cooler & separator tank");
   pbPairRow(pb,"Seal water system",rSelText(p+"cooler_system"),"Cooler condition",rSelText(p+"cooler_cond"));
   if(rv(p+"cooler_notes"))pbNoteRow(pb,"Cooler comment: "+rv(p+"cooler_notes"));
@@ -3914,39 +3918,40 @@ function pbDrawPump(pb,n,secNorm){
  var vibFields=["vib_pde_ax","vib_pde_h","vib_pde_v","vib_pnde_ax","vib_pnde_h","vib_pnde_v","vib_mde_ax","vib_mde_h","vib_mde_v","vib_mnde_ax","vib_mnde_h","vib_mnde_v"];
  var vibIdsFull=[];
  for(var vk=0;vk<vibFields.length;vk++)vibIdsFull.push(p+vibFields[vk]);
- var hasMeasurements=lriAny([p+"t_amb",p+"t_suc",p+"t_dis",p+"t_case",p+"t_motor",p+"vac_rated_n",p+"vac_meas_n",p+"pd_exp_n",p+"pd_meas_n",p+"leak_n",p+"vap_pct_n",p+"amps_rated",p+"amps_meas",p+"sw_flow",p+"sw_temp_in",p+"sw_temp_out"])||lriAny(vibIdsFull);
+ var hasMeasurements=lriAny([p+"t_amb",p+"t_suc",p+"t_dis",p+"t_case",p+"t_motor",p+"vac_rated_n",p+"vac_meas_n",p+"pd_exp_n",p+"pd_meas_n",p+"leak_n",p+"vap_pct_n",p+"amps_rated",p+"amps_meas",p+"sw_flow",p+"sw_temp_in",p+"sw_temp_out"])||lriAny(vibIdsFull)
+  ||pbHasPhotos(secNorm,p+"temp")||pbHasPhotos(secNorm,p+"vac")||pbHasPhotos(secNorm,p+"pd")||pbHasPhotos(secNorm,p+"leak")||pbHasPhotos(secNorm,p+"vap")||pbHasPhotos(secNorm,p+"amps")||pbHasPhotos(secNorm,p+"sw")||pbHasPhotos(secNorm,p+"vib");
  if(hasMeasurements){
   pbHeaderRow(pb,"Measurements");
-  if(lriAny([p+"t_amb",p+"t_suc",p+"t_dis",p+"t_case",p+"t_motor"])){
+  if(lriAny([p+"t_amb",p+"t_suc",p+"t_dis",p+"t_case",p+"t_motor"])||pbHasPhotos(secNorm,p+"temp")){
    pbPairRow(pb,"Temperatures","Ambient "+rNum(p+"t_amb","°C")+" · Suction "+rNum(p+"t_suc","°C")+" · Discharge "+rNum(p+"t_dis","°C")+" · Casing "+rNum(p+"t_case","°C")+" · Motor "+rNum(p+"t_motor","°C"));
    if(lriAny([p+"t_suc"])&&lriAny([p+"t_dis"]))pbNoteRow(pb,rSpan(p+"temp_note"));
    pbSecPhotos(pb,secNorm,p+"temp");
   }
-  if(lriAny([p+"vac_rated_n",p+"vac_meas_n"])){
+  if(lriAny([p+"vac_rated_n",p+"vac_meas_n"])||pbHasPhotos(secNorm,p+"vac")){
    pbPairRow(pb,"Rated duty vacuum",rUnitVal(p+"vac_rated_n",p+"vac_rated_u"),"Measured today",rUnitVal(p+"vac_meas_n",p+"vac_meas_u"));
    if(lriAny([p+"vac_rated_n"])&&lriAny([p+"vac_meas_n"]))pbNoteRow(pb,rSpan(p+"vac_note"));
    pbSecPhotos(pb,secNorm,p+"vac");
   }
-  if(lriAny([p+"pd_exp_n",p+"pd_meas_n"])){
+  if(lriAny([p+"pd_exp_n",p+"pd_meas_n"])||pbHasPhotos(secNorm,p+"pd")){
    pbPairRow(pb,"Hogging pump-down, expected",rUnitVal(p+"pd_exp_n",p+"pd_exp_u"),"Measured today",rUnitVal(p+"pd_meas_n",p+"pd_meas_u"));
    if(lriAny([p+"pd_exp_n"])&&lriAny([p+"pd_meas_n"]))pbNoteRow(pb,rSpan(p+"pd_note"));
    pbSecPhotos(pb,secNorm,p+"pd");
   }
-  if(lriAny([p+"leak_n"])){
+  if(lriAny([p+"leak_n"])||pbHasPhotos(secNorm,p+"leak")){
    pbPairRow(pb,"Condenser air in-leakage",rUnitVal(p+"leak_n",p+"leak_u"));
    if(rv(p+"leak_notes"))pbNoteRow(pb,"Leak-in notes: "+rv(p+"leak_notes"));
    pbSecPhotos(pb,secNorm,p+"leak");
   }
-  if(lriAny([p+"vap_pct_n"])){
+  if(lriAny([p+"vap_pct_n"])||pbHasPhotos(secNorm,p+"vap")){
    pbPairRow(pb,"Condenser vapour load",rNum(p+"vap_pct_n","% of extracted flow"));
    pbSecPhotos(pb,secNorm,p+"vap");
   }
-  if(lriAny([p+"amps_rated",p+"amps_meas"])){
+  if(lriAny([p+"amps_rated",p+"amps_meas"])||pbHasPhotos(secNorm,p+"amps")){
    pbPairRow(pb,"Nameplate FLA",rNum(p+"amps_rated","A"),"Measured current",rNum(p+"amps_meas","A"));
    if(lriAny([p+"amps_rated"])&&lriAny([p+"amps_meas"]))pbNoteRow(pb,rSpan(p+"amps_note"));
    pbSecPhotos(pb,secNorm,p+"amps");
   }
-  if(lriAny([p+"sw_flow",p+"sw_temp_in",p+"sw_temp_out"])){
+  if(lriAny([p+"sw_flow",p+"sw_temp_in",p+"sw_temp_out"])||pbHasPhotos(secNorm,p+"sw")){
    pbPairRow(pb,"Seal water","Flow "+rNum(p+"sw_flow","L/min")+" · In "+rNum(p+"sw_temp_in","°C")+" · Out "+rNum(p+"sw_temp_out","°C"));
    pbSecPhotos(pb,secNorm,p+"sw");
   }
@@ -3965,7 +3970,7 @@ function pbDrawPump(pb,n,secNorm){
  var exCount=LRI_EXTRA_COUNT[n]||0,ei;
  for(ei=1;ei<=exCount;ei++){
   var ep="lri_r"+n+"_ex"+ei+"_";
-  if(!lriAny(lriExtraFields(n,ei)))continue;
+  if(!lriAny(lriExtraFields(n,ei))&&!pbHasPhotos(secNorm,ep+"ph"))continue;
   var es=lriSevOf(ep+"cond");
   pbHeaderRow(pb,rv(ep+"label")||"Additional section");
   pbPairRow(pb,"Condition",rSelText(ep+"cond"),"Value / reading",rv(ep+"value"),
