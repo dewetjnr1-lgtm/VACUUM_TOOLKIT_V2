@@ -915,6 +915,57 @@ td:first-child{text-align:left;font-family:var(--sans);}
 <div class="ar">Everything typed here, including photos, is saved on this phone as you go, so the sheet survives closing the app. Export PDF builds the finished PDF file directly and downloads it &mdash; there's no print screen to fight with, and no browser web-address or date stamped on the page.</div>
 </div>
 <div class="card"><h3>Job details</h3><button class="exbtn" onclick="lriInsertExample()">Insert example</button><button class="exbtn" onclick="lriExportPDF()">Export PDF</button><button class="clrbtn" onclick="lriClear()">Clear this report</button>
+<div class="fld"><div class="fh"><label>Application</label><button class="q" onclick="hp('h_lri_app')">?</button></div><div class="help" id="h_lri_app">What this pump duty actually does on site. Not on the list? Pick "Other" and type it in &mdash; every application here prints the same report today; tailored question sets per application are coming.</div><div class="ctrl"><select id="lri_app" onchange="lriOC('lri_app')">
+<option value=""></option>
+<optgroup label="Dewatering &amp; filtration">
+<option value="belt_filter">Belt filter press / vacuum dewatering</option>
+<option value="drum_filter">Rotary drum or disc vacuum filter</option>
+<option value="nutsche">Nutsche / chemical vacuum filter</option>
+</optgroup>
+<optgroup label="Pulp, paper &amp; textile">
+<option value="paper_machine">Paper machine vacuum (forming / pick-up / press)</option>
+<option value="textile">Textile vacuum (fabric handling / drying)</option>
+</optgroup>
+<optgroup label="Power &amp; steam">
+<option value="condenser">Steam surface condenser air removal</option>
+<option value="deaeration">Deaeration / priming</option>
+</optgroup>
+<optgroup label="Chemical &amp; process">
+<option value="distillation">Vacuum distillation</option>
+<option value="evaporation">Vacuum evaporation / concentration</option>
+<option value="crystallization">Vacuum crystallization</option>
+<option value="vac_drying">Vacuum drying</option>
+<option value="reactor">Reactor / vessel vacuum</option>
+</optgroup>
+<optgroup label="Food &amp; beverage">
+<option value="vac_packaging">Vacuum packaging / MAP</option>
+<option value="food_evap">Milk / sugar evaporation</option>
+<option value="freeze_dry">Freeze drying support</option>
+</optgroup>
+<optgroup label="Metals &amp; foundry">
+<option value="steel_degas">Steel degassing (RH / VOD)</option>
+<option value="investment_cast">Investment casting vacuum</option>
+</optgroup>
+<optgroup label="Oil, gas &amp; vapour recovery">
+<option value="vru">Vapour recovery unit (tank truck / terminal loading)</option>
+<option value="flare_gas">Flare gas recovery</option>
+<option value="stabilization">Crude / condensate stabilization</option>
+</optgroup>
+<optgroup label="Environmental &amp; water">
+<option value="vac_sewer">Municipal vacuum sewer collection</option>
+<option value="aeration">Wastewater aeration (compressor / blower duty)</option>
+<option value="biogas">Biogas / digester gas handling</option>
+</optgroup>
+<optgroup label="Pneumatic conveying">
+<option value="vac_conveying">Vacuum pneumatic conveying (powders / granules)</option>
+</optgroup>
+<optgroup label="General / other">
+<option value="central_vac">Central plant vacuum system</option>
+<option value="woodworking">Woodworking vacuum press / veneer</option>
+<option value="own">Other &mdash; please specify&hellip;</option>
+</optgroup>
+</select></div>
+<input type="text" id="lri_app_oc" class="ocin" placeholder="Type the application" style="display:none">
 <div class="fld"><div class="fh"><label>Your company (shown on the report header)</label></div><div class="ctrl"><input type="text" id="lri_company"></div></div>
 <div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="lri_letterhead"> Print on the Busch letterhead (logo header and company footer, instead of the plain company line)</label></div></div>
 <div class="fld"><div class="fh"><label>Client</label></div><div class="ctrl"><input type="text" id="lri_client"></div></div>
@@ -2446,7 +2497,7 @@ var EX={
   lft_r3_vac_ie:150,lft_r3_vac_de:160,lft_r3_cfm_tested:80,lft_r3_cfm_new:110,lft_r3_amps:65,
   lft_bt_de:55,lft_bt_nde:52,lft_wq_temp:22,lft_wq_cond:450,lft_wq_ds:300,lft_wq_sal:50,lft_wq_ph:7.2,
   lft_v_de_ax:1.2,lft_v_de_h:1.5,lft_v_de_v:1.1,lft_v_nde_ax:1.0,lft_v_nde_h:1.3,lft_v_nde_v:0.9},
- lri:{lri_company:"Busch ANZ Pty Ltd",lri_client:"Kwinana Energy Recovery (Acciona)",lri_site:"Kwinana Energy Recovery, WA",lri_contact:"Brad James",lri_contact_ph:"0404 789 536",lri_ref:"WA26-0123",lri_po:"PO-45821",lri_scope:"basic_om",lri_date:"2026-07-21",lri_by:"C. de Wet, J. Service",
+ lri:{lri_app:"condenser",lri_company:"Busch ANZ Pty Ltd",lri_client:"Kwinana Energy Recovery (Acciona)",lri_site:"Kwinana Energy Recovery, WA",lri_contact:"Brad James",lri_contact_ph:"0404 789 536",lri_ref:"WA26-0123",lri_po:"PO-45821",lri_scope:"basic_om",lri_date:"2026-07-21",lri_by:"C. de Wet, J. Service",
   lri_findings:"Both hogging vacuum pumps inspected per quote WA26-0123 (basic inspection plus O&M preventative maintenance checks). Pump A is in good order. Pump B needs a mechanical seal replacement and a seal water cooler clean at the next planned shutdown; bearing DE temperature, discharge temperature and vibration are all elevated and worth monitoring in the meantime.",
   lri_followup:"Quote mechanical seal replacement and cooler clean, Pump B",
   lri_r1_tag:"Hogging Vacuum Pump A",lri_r1_make:"NASH",lri_r1_model:"2BE1 (per nameplate)",lri_r1_serial:"e.g. 123456",lri_r1_year:2015,lri_r1_maxp_n:6.5,lri_r1_maxp_u:"4",
@@ -2847,10 +2898,10 @@ function lriSelBlock(id,opts){
   '<input type="text" id="'+id+'_oc" class="ocin" placeholder="Type your own comment" style="display:none">';
 }
 function lriOC(id){var s=document.getElementById(id),oc=document.getElementById(id+"_oc");if(s&&oc)oc.style.display=(s.value==="own")?"block":"none";}
-function lriRefreshAllOC(){var sels=document.querySelectorAll('#lri_rows select');for(var i=0;i<sels.length;i++)lriOC(sels[i].id);}
+function lriRefreshAllOC(){var sels=document.querySelectorAll('#lri_rows select, #lri_app');for(var i=0;i<sels.length;i++)lriOC(sels[i].id);}
 window.lriOC=lriOC;
 var LRI_KEY="vt_lri1",LRI_RC_KEY="vt_lri_rc";
-var LRI_HEADER=["lri_company","lri_letterhead","lri_client","lri_site","lri_contact","lri_contact_ph","lri_ref","lri_po","lri_scope","lri_date","lri_by","lri_findings","lri_followup","lri_nextdate"];
+var LRI_HEADER=["lri_app","lri_app_oc","lri_company","lri_letterhead","lri_client","lri_site","lri_contact","lri_contact_ph","lri_ref","lri_po","lri_scope","lri_date","lri_by","lri_findings","lri_followup","lri_nextdate"];
 var LRI_ROWCOUNT=0;
 var LRI_PHOTOS=[];
 function lriRowHTML(n){
@@ -3732,6 +3783,7 @@ function lriExportPDF(){
  Promise.all(normPromises).then(function(norm){
   var pb=pbCreate(letterheadOn,company);
   pbTitle(pb,"LIQUID RING VACUUM PUMP INSPECTION REPORT");
+  if(rv("lri_app"))pbPairRow(pb,"Application",rSelText("lri_app"));
   pbPairRow(pb,"Client",rv("lri_client"),"Site",rv("lri_site"));
   pbPairRow(pb,"Site contact",rv("lri_contact"),"Contact phone",rv("lri_contact_ph"));
   pbPairRow(pb,"Quote / job ref",rv("lri_ref"),"Customer order / PO No.",rv("lri_po"));
