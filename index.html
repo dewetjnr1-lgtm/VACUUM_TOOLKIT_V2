@@ -2513,6 +2513,7 @@ var EX={
   lri_r1_t_amb:24,lri_r1_t_suc:26,lri_r1_t_dis:42,lri_r1_t_case:35,lri_r1_t_motor:48,
   lri_r1_vac_rated_n:85,lri_r1_vac_rated_u:"0",lri_r1_vac_meas_n:82,lri_r1_vac_meas_u:"0",
   lri_r1_pd_exp_n:15,lri_r1_pd_exp_u:"0",lri_r1_pd_meas_n:16,lri_r1_pd_meas_u:"0",
+  lri_r1_leak_n:0.8,lri_r1_leak_u:"0",lri_r1_leak_notes:"Condenser isolated and checked at the shell — no obvious source, within normal range.",lri_r1_vap_pct_n:6.5,
   lri_r1_amps_rated:45,lri_r1_amps_meas:41,
   lri_r1_sw_flow:120,lri_r1_sw_temp_in:22,lri_r1_sw_temp_out:28,
   lri_r1_vib_pde_ax:1.4,lri_r1_vib_pde_h:1.8,lri_r1_vib_pde_v:1.2,lri_r1_vib_pnde_ax:1.1,lri_r1_vib_pnde_h:1.5,lri_r1_vib_pnde_v:1.0,
@@ -2531,6 +2532,7 @@ var EX={
   lri_r2_t_amb:24,lri_r2_t_suc:27,lri_r2_t_dis:63,lri_r2_t_case:41,lri_r2_t_motor:56,
   lri_r2_vac_rated_n:85,lri_r2_vac_rated_u:"0",lri_r2_vac_meas_n:74,lri_r2_vac_meas_u:"0",
   lri_r2_pd_exp_n:15,lri_r2_pd_exp_u:"0",lri_r2_pd_meas_n:23,lri_r2_pd_meas_u:"0",
+  lri_r2_leak_n:3.2,lri_r2_leak_u:"0",lri_r2_leak_notes:"Higher than Pump A — suspect the expansion joint on the inlet neck, recommend a soap test at next shutdown.",lri_r2_vap_pct_n:7.8,
   lri_r2_amps_rated:45,lri_r2_amps_meas:47,
   lri_r2_sw_flow:115,lri_r2_sw_temp_in:23,lri_r2_sw_temp_out:31,
   lri_r2_vib_pde_ax:3.2,lri_r2_vib_pde_h:3.6,lri_r2_vib_pde_v:2.9,lri_r2_vib_pnde_ax:2.6,lri_r2_vib_pnde_h:2.9,lri_r2_vib_pnde_v:2.4,
@@ -2973,12 +2975,21 @@ function lriRowHTML(n){
  '<div class="mgrid"><div class="mgf"><span class="mlab">Rated duty vacuum</span><div class="ctrl"><input type="number" id="'+p+'vac_rated_n" placeholder="number"><select id="'+p+'vac_rated_u" data-g="pressure" data-du="0"></select></div></div><div class="mgf"><span class="mlab">Measured today</span><div class="ctrl"><input type="number" id="'+p+'vac_meas_n" placeholder="number"><select id="'+p+'vac_meas_u" data-g="pressure" data-du="0"></select></div></div></div>'+
  '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullMav('+n+')">Pull from vacuum calculator</button>'+
  '<p id="'+p+'vac_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in both to compare against rated duty. No nameplate figure handy? Open the vacuum calculator above, enter today\'s seal water temperature and site altitude, then come back and tap "Pull from vacuum calculator" to use that as your rated comparison point.</p>'+
- '<div id="'+p+'pd_wrap" style="display:none">'+
+ '<div id="'+p+'cond_wrap" style="display:none">'+
  '<div class="tp-num tp-link" onclick="lriGoCalc(\'pd\','+n+')" title="Open the pump-down time calculator, then come back and pull the number in">Extra: hogging pump-down time <span class="tp-go">Open calculator &rsaquo;</span></div>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">How long this pump takes to hog the condenser down from atmospheric to working vacuum. A time well above expected usually means an air in-leak into the condenser shell, not the pump.</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Expected time</span><div class="ctrl"><input type="number" id="'+p+'pd_exp_n" placeholder="number"><select id="'+p+'pd_exp_u" data-g="time" data-du="0"></select></div></div><div class="mgf"><span class="mlab">Measured today</span><div class="ctrl"><input type="number" id="'+p+'pd_meas_n" placeholder="number"><select id="'+p+'pd_meas_u" data-g="time" data-du="0"></select></div></div></div>'+
  '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullPd('+n+')">Pull from pump-down calculator</button>'+
  '<p id="'+p+'pd_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in both to compare. No expected figure handy? Open the pump-down calculator above, enter the condenser shell volume, this pump\'s speed and the target vacuum, then come back and tap "Pull from pump-down calculator".</p>'+
+ '<div class="tp-num tp-link" onclick="lriGoCalc(\'lk\','+n+')" title="Open the leak check calculator, then come back and pull the number in">Extra: condenser air in-leakage <span class="tp-go">Open calculator &rsaquo;</span></div>'+
+ '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Continuous air in-leakage through glands, expansion joints and flanges below the waterline is what the holding duty has to keep up with once the condenser is hogged down. Isolate the condenser, watch the pressure climb with the pump off, and log the rate here.</p>'+
+ '<div class="fld" style="padding-top:0"><div class="fh"><label>Measured leak rate</label></div><div class="ctrl"><input type="number" id="'+p+'leak_n" placeholder="number"><select id="'+p+'leak_u" data-g="leak" data-du="0"></select></div></div>'+
+ '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullLk('+n+')">Pull from leak check calculator</button>'+
+ '<div class="fld"><div class="fh"><label>Leak-in notes</label></div><div class="ctrl"><textarea id="'+p+'leak_notes" rows="2" placeholder="Where checked, suspected source if found..."></textarea></div></div>'+
+ '<div class="tp-num tp-link" onclick="lriGoCalc(\'vap\','+n+')" title="Open the vapour and wet gas calculator, then come back and pull the number in">Extra: condenser vapour load <span class="tp-go">Open calculator &rsaquo;</span></div>'+
+ '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">How much of the extracted flow is water vapour rather than air, at the suction temperature and measured vacuum. A high share usually points to the condenser itself running warm (cooling water side), not the vacuum pump.</p>'+
+ '<div class="fld" style="padding-top:0"><div class="fh"><label>Water vapour share</label></div><div class="ctrl"><input type="number" id="'+p+'vap_pct_n" placeholder="number"><span class="fu">%</span></div></div>'+
+ '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullVap('+n+')">Pull from vapour calculator</button>'+
  '</div>'+
  '<div class="tp-num">Extra: motor current</div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Nameplate FLA</span><div class="ctrl"><input type="number" id="'+p+'amps_rated" placeholder="number"><span class="fu">A</span></div></div><div class="mgf"><span class="mlab">Measured running current</span><div class="ctrl"><input type="number" id="'+p+'amps_meas" placeholder="number"><span class="fu">A</span></div></div></div>'+
@@ -3026,6 +3037,7 @@ function lriRowFields(n){
   p+"t_amb",p+"t_suc",p+"t_dis",p+"t_case",p+"t_motor",
   p+"vac_rated_n",p+"vac_rated_u",p+"vac_meas_n",p+"vac_meas_u",
   p+"pd_exp_n",p+"pd_exp_u",p+"pd_meas_n",p+"pd_meas_u",
+  p+"leak_n",p+"leak_u",p+"leak_notes",p+"vap_pct_n",
   p+"amps_rated",p+"amps_meas",
   p+"sw_flow",p+"sw_temp_in",p+"sw_temp_out",
   p+"vib_pde_ax",p+"vib_pde_h",p+"vib_pde_v",p+"vib_pnde_ax",p+"vib_pnde_h",p+"vib_pnde_v",
@@ -3151,9 +3163,28 @@ function lriPullPd(n){
  recalc();
 }
 window.lriPullPd=lriPullPd;
-// Applications where a start-of-run hogging pump-down time is a meaningful check.
-// Extend this list as tailored logic is added for more applications.
-var LRI_APP_HOGGING=["condenser"];
+function lriPullLk(n){
+ var rate=BASE["lk_out"];
+ if(isNaN(rate)){alert("Open the leak check calculator first (tap the \"Extra: condenser air in-leakage\" heading above) and fill in the sealed volume, pressure rise and duration, then come back.");return;}
+ var p="lri_r"+n+"_",u=gs(p+"leak_u");
+ if(u===null){alert("Add this pump row first.");return;}
+ document.getElementById(p+"leak_n").value=Math.round((rate/G.leak[+u][1])*1000)/1000;
+ recalc();
+}
+window.lriPullLk=lriPullLk;
+function lriPullVap(n){
+ var el=document.getElementById("vap_pct");
+ var pct=el?parseFloat(el.textContent):NaN;
+ if(!el||isNaN(pct)){alert("Open the vapour calculator first (tap the \"Extra: condenser vapour load\" heading above) and fill in the suction gas temperature and vacuum, then come back.");return;}
+ var p="lri_r"+n+"_";
+ if(!document.getElementById(p+"vap_pct_n")){alert("Add this pump row first.");return;}
+ document.getElementById(p+"vap_pct_n").value=Math.round(pct*10)/10;
+ recalc();
+}
+window.lriPullVap=lriPullVap;
+// Applications that get the condenser-specific extras (hogging pump-down time,
+// air in-leakage, vapour load). Extend as tailored logic is added for more applications.
+var LRI_APP_CONDENSER=["condenser"];
 // Insert example needs at least one additional-check row per pump to exist before
 // the generic ex() can fill in its demo values, since growable rows aren't in the
 // DOM until something adds them.
@@ -3209,8 +3240,8 @@ function lriRowCalc(n){
    vacEl.textContent=deltaKPa>=-0.5?"Meeting or exceeding rated duty vacuum.":"Short of rated duty by about "+fmtA(Math.abs(deltaKPa))+" kPa — check seal water temperature, air leaks, or wear.";
   }
  }
- var pdWrap=document.getElementById(p+"pd_wrap");
- if(pdWrap)pdWrap.style.display=LRI_APP_HOGGING.indexOf(gs("lri_app"))>=0?"":"none";
+ var condWrap=document.getElementById(p+"cond_wrap");
+ if(condWrap)condWrap.style.display=LRI_APP_CONDENSER.indexOf(gs("lri_app"))>=0?"":"none";
  var pen=gv(p+"pd_exp_n"),peu=gs(p+"pd_exp_u"),pmn=gv(p+"pd_meas_n"),pmu=gs(p+"pd_meas_u");
  var pdEl=document.getElementById(p+"pd_note");
  if(pdEl){
@@ -3761,7 +3792,7 @@ function pbDrawPump(pb,n){
  var vibFields=["vib_pde_ax","vib_pde_h","vib_pde_v","vib_pnde_ax","vib_pnde_h","vib_pnde_v","vib_mde_ax","vib_mde_h","vib_mde_v","vib_mnde_ax","vib_mnde_h","vib_mnde_v"];
  var vibIdsFull=[];
  for(var vk=0;vk<vibFields.length;vk++)vibIdsFull.push(p+vibFields[vk]);
- var hasMeasurements=lriAny([p+"t_amb",p+"t_suc",p+"t_dis",p+"t_case",p+"t_motor",p+"vac_rated_n",p+"vac_meas_n",p+"pd_exp_n",p+"pd_meas_n",p+"amps_rated",p+"amps_meas",p+"sw_flow",p+"sw_temp_in",p+"sw_temp_out"])||lriAny(vibIdsFull);
+ var hasMeasurements=lriAny([p+"t_amb",p+"t_suc",p+"t_dis",p+"t_case",p+"t_motor",p+"vac_rated_n",p+"vac_meas_n",p+"pd_exp_n",p+"pd_meas_n",p+"leak_n",p+"vap_pct_n",p+"amps_rated",p+"amps_meas",p+"sw_flow",p+"sw_temp_in",p+"sw_temp_out"])||lriAny(vibIdsFull);
  if(hasMeasurements){
   pbHeaderRow(pb,"Measurements");
   if(lriAny([p+"t_amb",p+"t_suc",p+"t_dis",p+"t_case",p+"t_motor"])){
@@ -3776,6 +3807,11 @@ function pbDrawPump(pb,n){
    pbPairRow(pb,"Hogging pump-down, expected",rUnitVal(p+"pd_exp_n",p+"pd_exp_u"),"Measured today",rUnitVal(p+"pd_meas_n",p+"pd_meas_u"));
    if(lriAny([p+"pd_exp_n"])&&lriAny([p+"pd_meas_n"]))pbNoteRow(pb,rSpan(p+"pd_note"));
   }
+  if(lriAny([p+"leak_n"])){
+   pbPairRow(pb,"Condenser air in-leakage",rUnitVal(p+"leak_n",p+"leak_u"));
+   if(rv(p+"leak_notes"))pbNoteRow(pb,"Leak-in notes: "+rv(p+"leak_notes"));
+  }
+  if(lriAny([p+"vap_pct_n"]))pbPairRow(pb,"Condenser vapour load",rNum(p+"vap_pct_n","% of extracted flow"));
   if(lriAny([p+"amps_rated",p+"amps_meas"])){
    pbPairRow(pb,"Nameplate FLA",rNum(p+"amps_rated","A"),"Measured current",rNum(p+"amps_meas","A"));
    if(lriAny([p+"amps_rated"])&&lriAny([p+"amps_meas"]))pbNoteRow(pb,rSpan(p+"amps_note"));
