@@ -168,6 +168,13 @@ td:first-child{text-align:left;font-family:var(--sans);}
 .ctrl label.chk input{width:19px;height:19px;flex:0 0 auto;}
 .ocin{width:100%;box-sizing:border-box;margin-top:6px;font-family:var(--sans);font-size:14px;padding:9px;border:1px dashed var(--accent);border-radius:9px;background:rgba(255,255,255,.65);color:var(--ink);}
 .ocin:focus{outline:2px solid var(--teal);border-style:solid;border-color:var(--teal);}
+.secph{margin:8px 0 4px;padding:8px 0 0;border-top:1px dashed var(--line);}
+.secph-thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;}
+.secph-th{position:relative;width:74px;height:74px;border-radius:8px;overflow:hidden;border:1px solid var(--line);}
+.secph-th img{width:100%;height:100%;object-fit:cover;display:block;}
+.secph-th button{position:absolute;top:2px;right:2px;width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:13px;line-height:20px;padding:0;cursor:pointer;}
+.secph input[type=file]{font-size:12.5px;color:var(--soft);max-width:100%;}
+.secph-full{font-size:12px;color:var(--soft);}
 /* Inspection report: give each sub-section a clear divider and breathing room so the long pump block reads as separate cards, not one crowded list. */
 #lri_rows .tp-num{margin-top:26px;padding-top:16px;border-top:2px solid rgba(29,90,120,.18);}
 #lri_rows .card>.tp-num:first-of-type{margin-top:20px;}
@@ -972,7 +979,7 @@ td:first-child{text-align:left;font-family:var(--sans);}
 <div class="fld"><div class="fh"><label>Site</label></div><div class="ctrl"><input type="text" id="lri_site"></div></div>
 <div class="mgrid"><div class="mgf"><span class="mlab">Site contact</span><div class="ctrl"><input type="text" id="lri_contact"></div></div><div class="mgf"><span class="mlab">Contact phone</span><div class="ctrl"><input type="text" id="lri_contact_ph"></div></div></div>
 <div class="mgrid"><div class="mgf"><span class="mlab">Quote / job reference</span><div class="ctrl"><input type="text" id="lri_ref"></div></div><div class="mgf"><span class="mlab">Customer order / PO No.</span><div class="ctrl"><input type="text" id="lri_po"></div></div></div>
-<div class="fld"><div class="fh"><label>Scope of service</label></div><div class="ctrl"><select id="lri_scope"><option value=""></option><option value="basic">Basic inspection (seals, bearings, borescope)</option><option value="basic_om">Basic inspection + O&amp;M preventative maintenance checks</option><option value="overhaul">Full overhaul (off-site)</option></select></div></div>
+<div class="fld"><div class="fh"><label>Scope of service</label></div><div class="ctrl"><select id="lri_scope" onchange="lriOC('lri_scope')"><option value=""></option><option value="basic">Basic inspection (seals, bearings, borescope)</option><option value="basic_om">Basic inspection + O&amp;M preventative maintenance checks</option><option value="overhaul">Full overhaul (off-site)</option><option value="own">Other &mdash; please specify&hellip;</option></select></div><input type="text" id="lri_scope_oc" class="ocin" placeholder="Type the scope of service" style="display:none"></div>
 <div class="fld"><div class="fh"><label>Inspection date</label></div><div class="ctrl"><input type="date" id="lri_date"></div></div>
 <div class="fld"><div class="fh"><label>Technician(s)</label></div><div class="ctrl"><input type="text" id="lri_by"></div></div>
 </div>
@@ -2902,10 +2909,10 @@ function lriSelBlock(id,opts){
   '<input type="text" id="'+id+'_oc" class="ocin" placeholder="Type your own comment" style="display:none">';
 }
 function lriOC(id){var s=document.getElementById(id),oc=document.getElementById(id+"_oc");if(s&&oc)oc.style.display=(s.value==="own")?"block":"none";}
-function lriRefreshAllOC(){var sels=document.querySelectorAll('#lri_rows select, #lri_app');for(var i=0;i<sels.length;i++)lriOC(sels[i].id);}
+function lriRefreshAllOC(){var sels=document.querySelectorAll('#lri_rows select, #lri_app, #lri_scope');for(var i=0;i<sels.length;i++)lriOC(sels[i].id);}
 window.lriOC=lriOC;
 var LRI_KEY="vt_lri1",LRI_RC_KEY="vt_lri_rc";
-var LRI_HEADER=["lri_app","lri_app_oc","lri_company","lri_letterhead","lri_client","lri_site","lri_contact","lri_contact_ph","lri_ref","lri_po","lri_scope","lri_date","lri_by","lri_findings","lri_followup","lri_nextdate"];
+var LRI_HEADER=["lri_app","lri_app_oc","lri_company","lri_letterhead","lri_client","lri_site","lri_contact","lri_contact_ph","lri_ref","lri_po","lri_scope","lri_scope_oc","lri_date","lri_by","lri_findings","lri_followup","lri_nextdate"];
 var LRI_ROWCOUNT=0;
 var LRI_PHOTOS=[];
 function lriRowHTML(n){
@@ -2922,22 +2929,26 @@ function lriRowHTML(n){
  '<p id="'+p+'seal_drip_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Gland packing should weep &mdash; about 45 to 60 drops a minute keeps it cool and lubricated. If the flow is too fast to count, just write that (e.g. &lsquo;pouring&rsquo;).</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Shaft / sleeve under packing</span>'+lriSelBlock(p+'seal_sleeve',LRI_OPT_COND3)+'</div><div class="mgf"><span class="mlab">Follower adjustment left</span>'+lriSelBlock(p+'seal_adj','<option value=""></option><option value="plenty">Plenty</option><option value="some">Some</option><option value="none">None &mdash; repack due</option>'+LRI_OPT_TAIL)+'</div></div>'+
  '<div class="fld"><div class="fh"><label>Seal notes</label></div><div class="ctrl"><textarea id="'+p+'seal_notes" rows="2" placeholder="Leakage rate, seal water flush condition..."></textarea></div></div>'+
+ lriSecPhotoHTML(p+'seals','Seals')+
  '<div class="tp-num">Bearings</div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Type</span>'+lriSelBlock(p+'brg_type',LRI_OPT_BRGTYPE)+'</div><div class="mgf"><span class="mlab">Condition</span>'+lriSelBlock(p+'brg_cond',LRI_OPT_COND)+'</div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Temp, drive end</span><div class="ctrl"><input type="number" id="'+p+'brg_de_temp" placeholder="number"><span class="fu">&deg;C</span></div></div><div class="mgf"><span class="mlab">Temp, non-drive end</span><div class="ctrl"><input type="number" id="'+p+'brg_nde_temp" placeholder="number"><span class="fu">&deg;C</span></div></div></div>'+
  '<p id="'+p+'brg_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Housing temperatures compare against ambient in the temperature survey below.</p>'+
  '<div class="fld"><div class="fh"><label>Bearing notes</label></div><div class="ctrl"><textarea id="'+p+'brg_notes" rows="2"></textarea></div></div>'+
+ lriSecPhotoHTML(p+'brg','Bearings')+
  '<div class="tp-num">Borescope inspection of casing</div>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Internal condition of the casting &mdash; corrosion, cavitation, and any abrasion or erosion damage.</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Corrosion</span>'+lriSelBlock(p+'bore_corr',LRI_OPT_SEV)+'</div><div class="mgf"><span class="mlab">Cavitation damage</span>'+lriSelBlock(p+'bore_cav',LRI_OPT_SEV)+'</div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Abrasion / erosion damage</span>'+lriSelBlock(p+'bore_abr',LRI_OPT_SEV)+'</div><div class="mgf"></div></div>'+
  '<div class="fld"><div class="fh"><label>Borescope notes / location of damage</label></div><div class="ctrl"><textarea id="'+p+'bore_notes" rows="2"></textarea></div></div>'+
+ lriSecPhotoHTML(p+'bore','Borescope')+
  '<div class="tp-num">General &amp; installation</div>'+
  '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'chk_rotation"> Rotation direction checked and correct</label></div></div>'+
  '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'chk_footbolts"> Foot &amp; hold-down bolts firmly tightened</label></div></div>'+
  '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'chk_guards"> All guards fitted and secure</label></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Inlet strainer / screen</span>'+lriSelBlock(p+'chk_strainer',LRI_OPT_COND3)+'</div><div class="mgf"><span class="mlab">Flexible connections / hoses</span>'+lriSelBlock(p+'chk_hoses',LRI_OPT_COND3)+'</div></div>'+
  '<div class="fld"><div class="fh"><label>Running observations</label></div><div class="ctrl"><textarea id="'+p+'run_obs" rows="2" placeholder="Noise, leaks, anything unusual while running..."></textarea></div></div>'+
+ lriSecPhotoHTML(p+'gen','General & installation')+
  '<div class="tp-num">Torque settings</div>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">There\'s no single industry-standard figure for these &mdash; the spec comes from the pump or coupling maker\'s own manual. Name each item you torqued, log the value you used, and add a comment. Add a line for every bolt group; leave one blank and it won\'t print.</p>'+
  '<div id="'+p+'torq"></div>'+
@@ -2957,46 +2968,56 @@ function lriRowHTML(n){
  '<p id="'+p+'belt_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in the span to get a target deflection (rule of thumb: about 16 mm per metre of span under firm thumb pressure).</p>'+
  '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'belt_guard"> Belt guard refitted and secure</label></div></div>'+
  '<div class="fld"><div class="fh"><label>Belt drive notes</label></div><div class="ctrl"><textarea id="'+p+'belt_notes" rows="2"></textarea></div></div>'+
+ lriSecPhotoHTML(p+'drive','Drive')+
  '<div class="tp-num">Seal water cooler</div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Seal water system</span>'+lriSelBlock(p+'cooler_system',LRI_OPT_COOLERSYS)+'</div><div class="mgf"><span class="mlab">Cooler condition</span>'+lriSelBlock(p+'cooler_cond',LRI_OPT_COND3)+'</div></div>'+
  '<div class="fld"><div class="fh"><label>Cooler comment</label></div><div class="ctrl"><textarea id="'+p+'cooler_notes" rows="2" placeholder="Observations on the cooler and the seal water arrangement..."></textarea></div></div>'+
+ lriSecPhotoHTML(p+'cooler','Seal water cooler')+
  '<div class="tp-num">Separator tank</div>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Inspected by borescope only &mdash; take a photo for the record.</p>'+
  '<div class="fld"><div class="fh"><label>Internal lining condition</label></div>'+lriSelBlock(p+'sep_lining',LRI_OPT_LINING)+'</div>'+
  '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'sep_bolts"> System bolts checked, tight and torqued to spec</label></div></div>'+
  '<div class="fld"><div class="fh"><label>Separator tank notes</label></div><div class="ctrl"><textarea id="'+p+'sep_notes" rows="2"></textarea></div></div>'+
+ lriSecPhotoHTML(p+'sep','Separator tank')+
  '<div class="tp-num">Extra: temperature survey (&deg;C)</div>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Spot readings around the pump and up and down stream &mdash; an infrared gun is fine. Skip any point you can\'t reach.</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Ambient</span><div class="ctrl"><input type="number" id="'+p+'t_amb" placeholder="number"><span class="fu">&deg;C</span></div></div><div class="mgf"><span class="mlab">Suction line</span><div class="ctrl"><input type="number" id="'+p+'t_suc" placeholder="number"><span class="fu">&deg;C</span></div></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Discharge line</span><div class="ctrl"><input type="number" id="'+p+'t_dis" placeholder="number"><span class="fu">&deg;C</span></div></div><div class="mgf"><span class="mlab">Pump casing</span><div class="ctrl"><input type="number" id="'+p+'t_case" placeholder="number"><span class="fu">&deg;C</span></div></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Motor frame</span><div class="ctrl"><input type="number" id="'+p+'t_motor" placeholder="number"><span class="fu">&deg;C</span></div></div><div class="mgf"></div></div>'+
  '<p id="'+p+'temp_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in suction and discharge to see the temperature change across the pump.</p>'+
+ lriSecPhotoHTML(p+'temp','Temperature survey')+
  '<div class="tp-num tp-link" onclick="lriGoCalc(\'mav\','+n+')" title="Open the vacuum calculator, then come back and pull the number in">Extra: vacuum performance <span class="tp-go">Open calculator &rsaquo;</span></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Rated duty vacuum</span><div class="ctrl"><input type="number" id="'+p+'vac_rated_n" placeholder="number"><select id="'+p+'vac_rated_u" data-g="pressure" data-du="0"></select></div></div><div class="mgf"><span class="mlab">Measured today</span><div class="ctrl"><input type="number" id="'+p+'vac_meas_n" placeholder="number"><select id="'+p+'vac_meas_u" data-g="pressure" data-du="0"></select></div></div></div>'+
  '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullMav('+n+')">Pull from vacuum calculator</button>'+
  '<p id="'+p+'vac_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in both to compare against rated duty. No nameplate figure handy? Open the vacuum calculator above, enter today\'s seal water temperature and site altitude, then come back and tap "Pull from vacuum calculator" to use that as your rated comparison point.</p>'+
+ lriSecPhotoHTML(p+'vac','Vacuum performance')+
  '<div id="'+p+'cond_wrap" style="display:none">'+
  '<div class="tp-num tp-link" onclick="lriGoCalc(\'pd\','+n+')" title="Open the pump-down time calculator, then come back and pull the number in">Extra: hogging pump-down time <span class="tp-go">Open calculator &rsaquo;</span></div>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">How long this pump takes to hog the condenser down from atmospheric to working vacuum. A time well above expected usually means an air in-leak into the condenser shell, not the pump.</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Expected time</span><div class="ctrl"><input type="number" id="'+p+'pd_exp_n" placeholder="number"><select id="'+p+'pd_exp_u" data-g="time" data-du="0"></select></div></div><div class="mgf"><span class="mlab">Measured today</span><div class="ctrl"><input type="number" id="'+p+'pd_meas_n" placeholder="number"><select id="'+p+'pd_meas_u" data-g="time" data-du="0"></select></div></div></div>'+
  '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullPd('+n+')">Pull from pump-down calculator</button>'+
  '<p id="'+p+'pd_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in both to compare. No expected figure handy? Open the pump-down calculator above, enter the condenser shell volume, this pump\'s speed and the target vacuum, then come back and tap "Pull from pump-down calculator".</p>'+
+ lriSecPhotoHTML(p+'pd','Hogging pump-down time')+
  '<div class="tp-num tp-link" onclick="lriGoCalc(\'lk\','+n+')" title="Open the leak check calculator, then come back and pull the number in">Extra: condenser air in-leakage <span class="tp-go">Open calculator &rsaquo;</span></div>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Continuous air in-leakage through glands, expansion joints and flanges below the waterline is what the holding duty has to keep up with once the condenser is hogged down. Isolate the condenser, watch the pressure climb with the pump off, and log the rate here.</p>'+
  '<div class="fld" style="padding-top:0"><div class="fh"><label>Measured leak rate</label></div><div class="ctrl"><input type="number" id="'+p+'leak_n" placeholder="number"><select id="'+p+'leak_u" data-g="leak" data-du="0"></select></div></div>'+
  '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullLk('+n+')">Pull from leak check calculator</button>'+
  '<div class="fld"><div class="fh"><label>Leak-in notes</label></div><div class="ctrl"><textarea id="'+p+'leak_notes" rows="2" placeholder="Where checked, suspected source if found..."></textarea></div></div>'+
+ lriSecPhotoHTML(p+'leak','Condenser air in-leakage')+
  '<div class="tp-num tp-link" onclick="lriGoCalc(\'vap\','+n+')" title="Open the vapour and wet gas calculator, then come back and pull the number in">Extra: condenser vapour load <span class="tp-go">Open calculator &rsaquo;</span></div>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">How much of the extracted flow is water vapour rather than air, at the suction temperature and measured vacuum. A high share usually points to the condenser itself running warm (cooling water side), not the vacuum pump.</p>'+
  '<div class="fld" style="padding-top:0"><div class="fh"><label>Water vapour share</label></div><div class="ctrl"><input type="number" id="'+p+'vap_pct_n" placeholder="number"><span class="fu">%</span></div></div>'+
  '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullVap('+n+')">Pull from vapour calculator</button>'+
+ lriSecPhotoHTML(p+'vap','Condenser vapour load')+
  '</div>'+
  '<div class="tp-num">Extra: motor current</div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Nameplate FLA</span><div class="ctrl"><input type="number" id="'+p+'amps_rated" placeholder="number"><span class="fu">A</span></div></div><div class="mgf"><span class="mlab">Measured running current</span><div class="ctrl"><input type="number" id="'+p+'amps_meas" placeholder="number"><span class="fu">A</span></div></div></div>'+
  '<p id="'+p+'amps_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in both to see % of full load.</p>'+
+ lriSecPhotoHTML(p+'amps','Motor current')+
  '<div class="tp-num">Extra: seal water</div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Flow</span><div class="ctrl"><input type="number" id="'+p+'sw_flow" placeholder="number"><span class="fu">L/min</span></div></div><div class="mgf"><span class="mlab">Inlet temp</span><div class="ctrl"><input type="number" id="'+p+'sw_temp_in" placeholder="number"><span class="fu">&deg;C</span></div></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Outlet temp</span><div class="ctrl"><input type="number" id="'+p+'sw_temp_out" placeholder="number"><span class="fu">&deg;C</span></div></div><div class="mgf"></div></div>'+
+ lriSecPhotoHTML(p+'sw','Seal water')+
  '<div class="tp-num">Extra: vibration (mm/s RMS)</div>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Take readings on the bearing housings, pump and motor, both ends, three directions. Skip what you can\'t reach.</p>'+
  '<p style="font-size:12px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.02em;margin:8px 0 2px">Pump, drive end</p>'+
@@ -3008,6 +3029,7 @@ function lriRowHTML(n){
  '<p style="font-size:12px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.02em;margin:8px 0 2px">Motor, non-drive end</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Axial</span><div class="ctrl"><input type="number" id="'+p+'vib_mnde_ax" placeholder="number"></div></div><div class="mgf"><span class="mlab">Horizontal</span><div class="ctrl"><input type="number" id="'+p+'vib_mnde_h" placeholder="number"></div></div><div class="mgf"><span class="mlab">Vertical</span><div class="ctrl"><input type="number" id="'+p+'vib_mnde_v" placeholder="number"></div></div></div>'+
  '<p id="'+p+'vib_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">General guidance per ISO 10816-3 vibration severity zones.</p>'+
+ lriSecPhotoHTML(p+'vib','Vibration')+
  '<div class="tp-num">Add your own section</div>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Anything you pick up on site that isn\'t covered above &mdash; base plate, oil level, whatever comes up. Give it a name and it appears on the printed report as its own section, exactly like the ones above. Add as many as you need; leave one blank and it simply won\'t print.</p>'+
  '<div id="lri_r'+n+'_extras"></div>'+
@@ -3016,6 +3038,7 @@ function lriRowHTML(n){
  '<div class="fld"><div class="fh"><label>Overall pump condition</label></div>'+lriSelBlock(p+'condition',LRI_OPT_COND)+'</div>'+
  '<div class="fld"><div class="fh"><label>Action priority</label></div>'+lriSelBlock(p+'priority',LRI_OPT_PRIORITY)+'</div>'+
  '<div class="fld"><div class="fh"><label>Corrective action recommended for this pump</label></div><div class="ctrl"><textarea id="'+p+'corrective" rows="3" placeholder="e.g. Replace mechanical seal; bearings within tolerance, monitor next service..."></textarea></div></div>'+
+ lriSecPhotoHTML(p+'overall','Overall')+
  '</div>';
 }
 // Every dropdown carries an "Own comment" option; its free-text box is stored under
@@ -3062,6 +3085,7 @@ function lriRemoveRow(){
  if(el)el.remove();
  delete LRI_EXTRA_COUNT[LRI_ROWCOUNT];
  delete LRI_TORQ_COUNT[LRI_ROWCOUNT];
+ lriPurgeSecPhotos("lri_r"+LRI_ROWCOUNT+"_");
  LRI_ROWCOUNT--;
  try{localStorage.setItem(LRI_RC_KEY,String(LRI_ROWCOUNT));}catch(err){}
  lriSaveTorqCounts();
@@ -3078,6 +3102,7 @@ function lriExtraHTML(n,m){
   '<div class="fld" style="margin-top:0"><div class="ctrl"><input type="text" class="secname" id="'+p+'label" placeholder="Name this section — e.g. Base plate, oil level..."></div></div>'+
   '<div class="mgrid"><div class="mgf"><span class="mlab">Condition</span>'+lriSelBlock(p+'cond',LRI_OPT_COND)+'</div><div class="mgf"><span class="mlab">Value / reading (optional)</span><div class="ctrl"><input type="text" id="'+p+'value" placeholder="e.g. 45 Nm"></div></div></div>'+
   '<div class="fld"><div class="fh"><label>Notes</label></div><div class="ctrl"><textarea id="'+p+'notes" rows="2"></textarea></div></div>'+
+  lriSecPhotoHTML(p+'ph','Extra section')+
  '</div>';
 }
 function lriExtraFields(n,m){
@@ -3105,6 +3130,7 @@ function lriTorqHTML(n,m){
   '<div class="fld" style="margin-top:0"><div class="ctrl"><input type="text" class="secname" id="'+p+'name" placeholder="Name this item — e.g. Body tie rods, Coupling bolts..."></div></div>'+
   '<div class="mgrid"><div class="mgf"><span class="mlab">Torque used</span><div class="ctrl"><input type="text" id="'+p+'val" placeholder="e.g. 45 Nm (per OEM manual)"></div></div><div class="mgf"><span class="mlab">Condition</span>'+lriSelBlock(p+'cond',LRI_OPT_COND)+'</div></div>'+
   '<div class="fld"><div class="fh"><label>Comment</label></div><div class="ctrl"><textarea id="'+p+'notes" rows="2"></textarea></div></div>'+
+  lriSecPhotoHTML(p+'ph','Torque item')+
  '</div>';
 }
 function lriTorqFields(n,m){
@@ -3127,6 +3153,7 @@ function lriRemoveTorq(n){
  if(m<=0)return;
  var el=document.getElementById("lri_r"+n+"_tq"+m);
  if(el)el.remove();
+ lriPurgeSecPhotos("lri_r"+n+"_tq"+m+"_");
  LRI_TORQ_COUNT[n]=m-1;
  lriSaveTorqCounts();
  recalc();
@@ -3137,6 +3164,7 @@ function lriRemoveExtra(n){
  if(m<=0)return;
  var el=document.getElementById("lri_r"+n+"_ex"+m);
  if(el)el.remove();
+ lriPurgeSecPhotos("lri_r"+n+"_ex"+m+"_");
  LRI_EXTRA_COUNT[n]=m-1;
  lriSaveExtraCounts();
  recalc();
@@ -3343,6 +3371,77 @@ function lriHandleFiles(files){
  });
 }
 function lriRemovePhoto(i){LRI_PHOTOS.splice(i,1);lriRenderPhotos();lriSave();}
+// Per-section photos: a small, reusable 1-or-2-photo attach widget dropped in after
+// every section (fixed, torque item, or custom extra). Keyed by a unique section id
+// (e.g. "lri_r1_seals"); LRI_SEC_PHOTOS[id] is an array of at most 2 {src,caption}.
+// The file input has no "capture" attribute, so mobile browsers offer their normal
+// choice of camera or photo library, same as the main Photos card at the bottom.
+var LRI_SEC_PHOTOS={};
+function lriSecPhotoHTML(id,label){
+ // The label rides along on a data-label attribute rather than as an inline onchange
+ // argument -- JSON.stringify's double-quoted output would otherwise collide with the
+ // HTML attribute's own double quotes and corrupt the markup.
+ var labelAttr=pEsc(label).replace(/"/g,"&quot;");
+ return '<div class="secph" data-secid="'+id+'"><div class="secph-thumbs" id="'+id+'_thumbs"></div>'+
+  '<input type="file" accept="image/*" id="'+id+'_input" data-label="'+labelAttr+'" onchange="lriSecPhotoAdd(\''+id+'\',this)">'+
+  '<p class="secph-full" id="'+id+'_full" style="display:none">2 photos attached (max for this section) — remove one to add another.</p></div>';
+}
+function lriRenderSecPhotos(id){
+ var thumbs=document.getElementById(id+"_thumbs");
+ if(!thumbs)return;
+ var arr=LRI_SEC_PHOTOS[id]||[];
+ var h="";
+ for(var i=0;i<arr.length;i++)h+='<span class="secph-th"><img src="'+arr[i].src+'"><button type="button" onclick="lriSecPhotoRemove(\''+id+'\','+i+')">&times;</button></span>';
+ thumbs.innerHTML=h;
+ var inp=document.getElementById(id+"_input"),full=document.getElementById(id+"_full");
+ if(inp)inp.style.display=arr.length>=2?"none":"";
+ if(full)full.style.display=arr.length>=2?"":"none";
+}
+function lriRenderAllSecPhotos(){
+ var els=document.querySelectorAll(".secph");
+ for(var i=0;i<els.length;i++)lriRenderSecPhotos(els[i].getAttribute("data-secid"));
+}
+function lriSecPhotoAdd(id,inputEl){
+ var label=inputEl.getAttribute("data-label")||"";
+ var files=Array.prototype.slice.call(inputEl.files||[]);
+ if(!files.length)return;
+ var arr=LRI_SEC_PHOTOS[id]=LRI_SEC_PHOTOS[id]||[];
+ files=files.slice(0,Math.max(0,2-arr.length));
+ files.forEach(function(file){
+  var reader=new FileReader();
+  reader.onload=function(e){
+   var img=new Image();
+   img.onload=function(){
+    var maxW=1000,scale=Math.min(1,maxW/img.width);
+    var w=Math.round(img.width*scale),h=Math.round(img.height*scale);
+    var canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
+    canvas.getContext("2d").drawImage(img,0,0,w,h);
+    arr.push({src:canvas.toDataURL("image/jpeg",0.72),caption:label});
+    lriRenderSecPhotos(id);
+    lriSave();
+   };
+   img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+ });
+ inputEl.value="";
+}
+function lriSecPhotoRemove(id,i){
+ var arr=LRI_SEC_PHOTOS[id];
+ if(!arr)return;
+ arr.splice(i,1);
+ lriRenderSecPhotos(id);
+ lriSave();
+}
+window.lriSecPhotoAdd=lriSecPhotoAdd;window.lriSecPhotoRemove=lriSecPhotoRemove;
+// Removing a pump, torque item or custom section frees up its id for reuse by the
+// next one added -- purge any photos left under that id prefix so they don't
+// silently reappear attached to whatever gets added next.
+function lriPurgeSecPhotos(prefix){
+ var any=false;
+ for(var k in LRI_SEC_PHOTOS)if(k.indexOf(prefix)===0){delete LRI_SEC_PHOTOS[k];any=true;}
+ if(any)lriSave();
+}
 function lriSaveCaptions(){
  for(var i=0;i<LRI_PHOTOS.length;i++){
   var e=document.getElementById("lri_ph"+i+"_cap");
@@ -3360,6 +3459,7 @@ function lriSave(){
   for(m=1;m<=tc;m++){f=lriTorqFields(n,m);for(j=0;j<f.length;j++){e=document.getElementById(f[j]);if(!e)continue;o[f[j]]=e.value;}}
  }
  o.photos=LRI_PHOTOS;
+ o.secPhotos=LRI_SEC_PHOTOS;
  var warn=document.getElementById("lri_warn");
  try{localStorage.setItem(LRI_KEY,JSON.stringify(o));if(warn)warn.style.display="none";}
  catch(err){if(warn)warn.style.display="block";}
@@ -3390,6 +3490,8 @@ function lriLoad(){
  }
  LRI_PHOTOS=Array.isArray(o.photos)?o.photos:[];
  lriRenderPhotos();
+ LRI_SEC_PHOTOS=(o.secPhotos&&typeof o.secPhotos==="object")?o.secPhotos:{};
+ lriRenderAllSecPhotos();
  lriRefreshAllOC();
 }
 function lriClear(){
@@ -3405,6 +3507,8 @@ function lriClear(){
  }
  LRI_PHOTOS=[];
  lriRenderPhotos();
+ LRI_SEC_PHOTOS={};
+ lriRenderAllSecPhotos();
  lriRefreshAllOC();
  try{localStorage.removeItem(LRI_KEY);}catch(err){}
  recalc();
@@ -3660,6 +3764,12 @@ function pbPhotoRow(pb,items){
  }
  pb.y=y0+ch+1.5+capH+4;
 }
+// Draws a section's 1-2 attached photos, if any, right where it's called -- secNorm
+// is the {id: [{src,w,h,caption}]} lookup built once in lriExportPDF from LRI_SEC_PHOTOS.
+function pbSecPhotos(pb,secNorm,id){
+ var items=secNorm&&secNorm[id];
+ if(items&&items.length)pbPhotoRow(pb,items);
+}
 // Measures the footer for this report once, up front, so pbCreate can reserve
 // the right amount of space at the bottom of every page. Letterhead mode gets
 // the full Busch company block; plain mode just a page-number line.
@@ -3705,7 +3815,7 @@ function pbFinalize(pb){
   pbDrawFooter(pb,i,total);
  }
 }
-function pbDrawPump(pb,n){
+function pbDrawPump(pb,n,secNorm){
  var p="lri_r"+n+"_";
  var tag=rv(p+"tag")||("Pump "+n);
  pbSecHead(pb,"Pump: "+tag);
@@ -3724,12 +3834,14 @@ function pbDrawPump(pb,n){
    pbPairRow(pb,"Shaft / sleeve under packing",rSelText(p+"seal_sleeve"),"Follower adjustment left",rSelText(p+"seal_adj"));
   if(lriAny([p+"seal_drip_before",p+"seal_drip_after"]))pbNoteRow(pb,rSpan(p+"seal_drip_note"));
   if(rv(p+"seal_notes"))pbNoteRow(pb,"Seal notes: "+rv(p+"seal_notes"));
+  pbSecPhotos(pb,secNorm,p+"seals");
   pbPairRow(pb,"Bearing type",rSelText(p+"brg_type"),"Bearing condition",rSelText(p+"brg_cond"));
   if(lriAny([p+"brg_de_temp",p+"brg_nde_temp"])){
    pbPairRow(pb,"Bearing temp DE / NDE",rNum(p+"brg_de_temp","°C")+" / "+rNum(p+"brg_nde_temp","°C"));
    pbNoteRow(pb,rSpan(p+"brg_note"));
   }
   if(rv(p+"brg_notes"))pbNoteRow(pb,"Bearing notes: "+rv(p+"brg_notes"));
+  pbSecPhotos(pb,secNorm,p+"brg");
   pbGap(pb,3);
  }
  if(lriAny([p+"bore_corr",p+"bore_cav",p+"bore_abr",p+"bore_notes"])){
@@ -3739,6 +3851,7 @@ function pbDrawPump(pb,n){
    corrSev<0?null:PB_SEV_RGB[corrSev],cavSev<0?null:PB_SEV_RGB[cavSev]);
   if(lriAny([p+"bore_abr"]))pbPairRow(pb,"Abrasion / erosion damage",rSelText(p+"bore_abr"),undefined,undefined,abrSev<0?null:PB_SEV_RGB[abrSev]);
   if(rv(p+"bore_notes"))pbNoteRow(pb,"Borescope notes: "+rv(p+"bore_notes"));
+  pbSecPhotos(pb,secNorm,p+"bore");
   pbGap(pb,3);
  }
  if(lriAny([p+"chk_rotation",p+"chk_footbolts",p+"chk_guards",p+"chk_strainer",p+"chk_hoses",p+"run_obs"])){
@@ -3747,6 +3860,7 @@ function pbDrawPump(pb,n){
   pbPairRow(pb,"All guards fitted & secure",rChkYN(p+"chk_guards"),"Inlet strainer / screen",rSelText(p+"chk_strainer"));
   pbPairRow(pb,"Flexible connections / hoses",rSelText(p+"chk_hoses"));
   if(rv(p+"run_obs"))pbNoteRow(pb,"Running observations: "+rv(p+"run_obs"));
+  pbSecPhotos(pb,secNorm,p+"gen");
   pbGap(pb,3);
  }
  var tqCount=LRI_TORQ_COUNT[n]||0,tqAnyFilled=false,ti,tqp;
@@ -3760,6 +3874,7 @@ function pbDrawPump(pb,n){
    pbPairRow(pb,rv(tqp+"name")||"Torque item",rv(tqp+"val")||"—",
     "Condition",rSelText(tqp+"cond"),null,tqSev<0?null:PB_SEV_RGB[tqSev]);
    if(rv(tqp+"notes"))pbNoteRow(pb,"Comment: "+rv(tqp+"notes"));
+   pbSecPhotos(pb,secNorm,tqp+"ph");
   }
   pbGap(pb,3);
  }
@@ -3779,14 +3894,17 @@ function pbDrawPump(pb,n){
    if(lriAny([p+"belt_span"]))pbNoteRow(pb,rSpan(p+"belt_note"));
    if(rv(p+"belt_notes"))pbNoteRow(pb,"Belt notes: "+rv(p+"belt_notes"));
   }
+  pbSecPhotos(pb,secNorm,p+"drive");
   pbGap(pb,3);
  }
  if(lriAny([p+"cooler_system",p+"cooler_cond",p+"cooler_notes",p+"sep_lining",p+"sep_bolts",p+"sep_notes"])){
   pbHeaderRow(pb,"Seal water cooler & separator tank");
   pbPairRow(pb,"Seal water system",rSelText(p+"cooler_system"),"Cooler condition",rSelText(p+"cooler_cond"));
   if(rv(p+"cooler_notes"))pbNoteRow(pb,"Cooler comment: "+rv(p+"cooler_notes"));
+  pbSecPhotos(pb,secNorm,p+"cooler");
   pbPairRow(pb,"Separator lining",rSelText(p+"sep_lining"),"Separator bolts torqued",rChkYN(p+"sep_bolts"));
   if(rv(p+"sep_notes"))pbNoteRow(pb,"Separator notes: "+rv(p+"sep_notes"));
+  pbSecPhotos(pb,secNorm,p+"sep");
   pbGap(pb,3);
  }
  var vibFields=["vib_pde_ax","vib_pde_h","vib_pde_v","vib_pnde_ax","vib_pnde_h","vib_pnde_v","vib_mde_ax","vib_mde_h","vib_mde_v","vib_mnde_ax","vib_mnde_h","vib_mnde_v"];
@@ -3798,26 +3916,36 @@ function pbDrawPump(pb,n){
   if(lriAny([p+"t_amb",p+"t_suc",p+"t_dis",p+"t_case",p+"t_motor"])){
    pbPairRow(pb,"Temperatures","Ambient "+rNum(p+"t_amb","°C")+" · Suction "+rNum(p+"t_suc","°C")+" · Discharge "+rNum(p+"t_dis","°C")+" · Casing "+rNum(p+"t_case","°C")+" · Motor "+rNum(p+"t_motor","°C"));
    if(lriAny([p+"t_suc"])&&lriAny([p+"t_dis"]))pbNoteRow(pb,rSpan(p+"temp_note"));
+   pbSecPhotos(pb,secNorm,p+"temp");
   }
   if(lriAny([p+"vac_rated_n",p+"vac_meas_n"])){
    pbPairRow(pb,"Rated duty vacuum",rUnitVal(p+"vac_rated_n",p+"vac_rated_u"),"Measured today",rUnitVal(p+"vac_meas_n",p+"vac_meas_u"));
    if(lriAny([p+"vac_rated_n"])&&lriAny([p+"vac_meas_n"]))pbNoteRow(pb,rSpan(p+"vac_note"));
+   pbSecPhotos(pb,secNorm,p+"vac");
   }
   if(lriAny([p+"pd_exp_n",p+"pd_meas_n"])){
    pbPairRow(pb,"Hogging pump-down, expected",rUnitVal(p+"pd_exp_n",p+"pd_exp_u"),"Measured today",rUnitVal(p+"pd_meas_n",p+"pd_meas_u"));
    if(lriAny([p+"pd_exp_n"])&&lriAny([p+"pd_meas_n"]))pbNoteRow(pb,rSpan(p+"pd_note"));
+   pbSecPhotos(pb,secNorm,p+"pd");
   }
   if(lriAny([p+"leak_n"])){
    pbPairRow(pb,"Condenser air in-leakage",rUnitVal(p+"leak_n",p+"leak_u"));
    if(rv(p+"leak_notes"))pbNoteRow(pb,"Leak-in notes: "+rv(p+"leak_notes"));
+   pbSecPhotos(pb,secNorm,p+"leak");
   }
-  if(lriAny([p+"vap_pct_n"]))pbPairRow(pb,"Condenser vapour load",rNum(p+"vap_pct_n","% of extracted flow"));
+  if(lriAny([p+"vap_pct_n"])){
+   pbPairRow(pb,"Condenser vapour load",rNum(p+"vap_pct_n","% of extracted flow"));
+   pbSecPhotos(pb,secNorm,p+"vap");
+  }
   if(lriAny([p+"amps_rated",p+"amps_meas"])){
    pbPairRow(pb,"Nameplate FLA",rNum(p+"amps_rated","A"),"Measured current",rNum(p+"amps_meas","A"));
    if(lriAny([p+"amps_rated"])&&lriAny([p+"amps_meas"]))pbNoteRow(pb,rSpan(p+"amps_note"));
+   pbSecPhotos(pb,secNorm,p+"amps");
   }
-  if(lriAny([p+"sw_flow",p+"sw_temp_in",p+"sw_temp_out"]))
+  if(lriAny([p+"sw_flow",p+"sw_temp_in",p+"sw_temp_out"])){
    pbPairRow(pb,"Seal water","Flow "+rNum(p+"sw_flow","L/min")+" · In "+rNum(p+"sw_temp_in","°C")+" · Out "+rNum(p+"sw_temp_out","°C"));
+   pbSecPhotos(pb,secNorm,p+"sw");
+  }
   var vibIds=["vib_pde","vib_pnde","vib_mde","vib_mnde"],vibLabs=["Vibration, pump DE","Vibration, pump NDE","Vibration, motor DE","Vibration, motor NDE"],vibAny=false,vi,ax,hh,vv2;
   for(vi=0;vi<4;vi++){
    ax=rv(p+vibIds[vi]+"_ax");hh=rv(p+vibIds[vi]+"_h");vv2=rv(p+vibIds[vi]+"_v");
@@ -3827,6 +3955,7 @@ function pbDrawPump(pb,n){
    }
   }
   if(vibAny)pbNoteRow(pb,rSpan(p+"vib_note"));
+  pbSecPhotos(pb,secNorm,p+"vib");
   pbGap(pb,3);
  }
  var exCount=LRI_EXTRA_COUNT[n]||0,ei;
@@ -3838,12 +3967,14 @@ function pbDrawPump(pb,n){
   pbPairRow(pb,"Condition",rSelText(ep+"cond"),"Value / reading",rv(ep+"value"),
    es<0?null:PB_SEV_RGB[es]);
   if(rv(ep+"notes"))pbNoteRow(pb,"Notes: "+rv(ep+"notes"));
+  pbSecPhotos(pb,secNorm,ep+"ph");
   pbGap(pb,3);
  }
  var condSev=lriSevOf(p+"condition"),prioSev=lriSevOf(p+"priority");
  pbPairRow(pb,"Overall condition",rSelText(p+"condition"),"Action priority",rSelText(p+"priority"),
   condSev<0?null:PB_SEV_RGB[condSev],prioSev<0?null:PB_SEV_RGB[prioSev]);
  pbBox(pb,rv(p+"corrective")||"No corrective action noted.");
+ pbSecPhotos(pb,secNorm,p+"overall");
  pbGap(pb,4);
 }
 function lriExportPDF(){
@@ -3853,7 +3984,17 @@ function lriExportPDF(){
  var photos=LRI_PHOTOS.slice();
  var normPromises=[];
  for(var k=0;k<photos.length;k++)normPromises.push(pbNormalizePhoto(photos[k].src));
+ var secKeys=Object.keys(LRI_SEC_PHOTOS),secEntries=[],secPromises=[];
+ secKeys.forEach(function(id){
+  (LRI_SEC_PHOTOS[id]||[]).forEach(function(ph){
+   secEntries.push(id);
+   secPromises.push(pbNormalizePhoto(ph.src).then(function(n2){return{src:n2.src,w:n2.w,h:n2.h,caption:ph.caption||""};}));
+  });
+ });
  Promise.all(normPromises).then(function(norm){
+ Promise.all(secPromises).then(function(secFlat){
+  var secNorm={};
+  for(var si=0;si<secEntries.length;si++)(secNorm[secEntries[si]]=secNorm[secEntries[si]]||[]).push(secFlat[si]);
   var pb=pbCreate(letterheadOn,company);
   pbTitle(pb,"LIQUID RING VACUUM PUMP INSPECTION REPORT");
   if(rv("lri_app"))pbPairRow(pb,"Application",rSelText("lri_app"));
@@ -3868,7 +4009,7 @@ function lriExportPDF(){
   pbSecHead(pb,"Findings & recommendations (overall)");
   pbBox(pb,rv("lri_findings")||"—");
   var n;
-  for(n=1;n<=LRI_ROWCOUNT;n++)pbDrawPump(pb,n);
+  for(n=1;n<=LRI_ROWCOUNT;n++)pbDrawPump(pb,n,secNorm);
   if(rv("lri_followup")||rDate("lri_nextdate"))
    pbPairRow(pb,"Follow-up required",rv("lri_followup"),"Next inspection due",rDate("lri_nextdate"));
   if(photos.length){
@@ -3883,6 +4024,7 @@ function lriExportPDF(){
   pbFinalize(pb);
   var fname=(rv("lri_ref")||"Liquid_Ring_Pump_Inspection").replace(/[^a-z0-9\-_]+/gi,"_")+".pdf";
   pb.doc.save(fname);
+ });
  });
 }
 window.lriAddRow=lriAddRow;window.lriRemoveRow=lriRemoveRow;window.lriRemovePhoto=lriRemovePhoto;window.lriClear=lriClear;window.lriExportPDF=lriExportPDF;
