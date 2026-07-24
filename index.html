@@ -52,14 +52,12 @@ h2{font-size:23px;margin:2px 0 10px;font-weight:800;}
 .tool-split::before,.tool-split::after{content:"";flex:1;border-top:3px double var(--line);}
 .orderbar{display:flex;gap:8px;margin:0 0 10px;flex-wrap:wrap;}
 .orderbar .clrbtn{margin-left:0;}
-.bub-slot{position:relative;}
-.bub-slot .mv{display:none;position:absolute;top:-6px;right:-4px;gap:4px;z-index:2;}
-.bubs.edit-order .bub-slot .mv{display:flex;}
-.bubs.edit-order .bub-slot .bub{pointer-events:none;opacity:.8;}
-.tool-split .mv{display:none;gap:4px;}
-.bubs.edit-order .tool-split .mv{display:flex;}
-.mvb{width:27px;height:27px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:14px;line-height:1;padding:0;cursor:pointer;box-shadow:0 1px 4px rgba(23,30,35,.18);}
-.mvb:disabled{opacity:.3;cursor:default;}
+.bub-slot,.tool-split{touch-action:pan-y;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+.bub-slot{position:relative;transition:transform .12s ease;}
+.bub-slot.dragging{z-index:50;transition:none;box-shadow:0 10px 22px rgba(23,30,35,.3);border-radius:18px;background:rgba(255,255,255,.6);}
+.bubs.jiggling .bub-slot:not(.dragging){animation:jig .26s ease-in-out infinite;}
+.bubs.jiggling .bub-slot .bub{pointer-events:none;}
+@keyframes jig{0%{transform:rotate(-1.2deg);}50%{transform:rotate(1.2deg);}100%{transform:rotate(-1.2deg);}}
 .about .law{display:inline-block;margin-top:6px;background:#fff;border:1px solid var(--teal);color:var(--teal);border-radius:20px;padding:3px 11px;font-size:12.5px;font-weight:700;}
 .about{display:none;}
 .about.open{display:block;}
@@ -231,8 +229,8 @@ td:first-child{text-align:left;font-family:var(--sans);}
 <button class="catrow c3" onclick="show('cat_site')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="5" width="15" height="15.5" rx="2"/><path d="M9 5V3.5h6V5"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg></span><div><b>On-Site Checks</b><small>Find the fault, pump-down, leak check, pipe loss, power</small></div><span class="chev">&#8250;</span></button>
 </section><section class="page" id="cat_learn">
 <h2>Play and Learn</h2>
-<p class="sub">Tap a tool to open it.</p>
-<div class="orderbar"><button type="button" class="clrbtn" id="editOrderBtn_cat_learn" onclick="toggleEditOrder('cat_learn')">Edit order</button><button type="button" class="clrbtn" id="resetOrderBtn_cat_learn" style="display:none" onclick="resetBubOrder('cat_learn')">Reset to default</button></div>
+<p class="sub">Tap a tool to open it. Press and hold a tile to move it.</p>
+<div class="orderbar"><button type="button" class="clrbtn" id="doneOrderBtn_cat_learn" style="display:none" onclick="exitJiggle('cat_learn')">Done</button><button type="button" class="clrbtn" id="resetOrderBtn_cat_learn" style="display:none" onclick="resetBubOrder('cat_learn')">Reset to default</button></div>
 <div class="bubs">
 <div class="bub-slot" data-key="learn"><button class="bub c1" onclick="show('learn')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="2.6"/><circle cx="17" cy="9.5" r="2.1"/><circle cx="11.5" cy="17" r="2.9"/><path d="M10 8.1l4.9 1M15.9 11.3l-2.9 3.4"/></svg></span><span>Learn the Gas Laws</span></button></div>
 <div class="bub-slot" data-key="lr"><button class="bub c1" onclick="show('lr')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="10.2" r="2.1"/><path d="M12 10.2V4.6M12 10.2l-5 3.4M12 10.2l5 3.4"/><path d="M5.3 16.2c2.1 1.6 4.3 2.4 6.7 2.4s4.6-.8 6.7-2.4" opacity=".65"/></svg></span><span>Inside a Liquid Ring Pump</span></button></div>
@@ -244,8 +242,8 @@ td:first-child{text-align:left;font-family:var(--sans);}
 </div>
 </section><section class="page" id="cat_size">
 <h2>Tools</h2>
-<p class="sub">Tap a tool to open it. Most used tools are at the top.</p>
-<div class="orderbar"><button type="button" class="clrbtn" id="editOrderBtn_cat_size" onclick="toggleEditOrder('cat_size')">Edit order</button><button type="button" class="clrbtn" id="resetOrderBtn_cat_size" style="display:none" onclick="resetBubOrder('cat_size')">Reset to default</button></div>
+<p class="sub">Tap a tool to open it. Most used tools are at the top. Press and hold a tile to move it.</p>
+<div class="orderbar"><button type="button" class="clrbtn" id="doneOrderBtn_cat_size" style="display:none" onclick="exitJiggle('cat_size')">Done</button><button type="button" class="clrbtn" id="resetOrderBtn_cat_size" style="display:none" onclick="resetBubOrder('cat_size')">Reset to default</button></div>
 <div class="bubs">
 <div class="bub-slot" data-key="vac"><button class="bub c2" onclick="show('vac')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15.5a8 8 0 0 1 16 0"/><path d="M12 15.5 7.7 11.2"/><circle cx="12" cy="15.5" r="1.4"/><path d="M12 7.7v1.5M17.5 10l-1 1M6.5 10l1 1" opacity=".65"/></svg></span><span>Vacuum Pump Sizing</span></button></div>
 <div class="bub-slot" data-key="cmp"><button class="bub c2" onclick="show('cmp')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="1.4"/><path d="M12.6 10.6c.3-2.6 1.5-4.3 3.4-5.5M13.2 12.9c2.4 1.1 3.7 2.7 4.2 5M10.3 12.4c-2.3 1.2-4.4 1.3-6.6.4"/></svg></span><span>Compressor Sizing</span></button></div>
@@ -269,8 +267,8 @@ td:first-child{text-align:left;font-family:var(--sans);}
 </div>
 </section><section class="page" id="cat_site">
 <h2>On-Site Checks</h2>
-<p class="sub">Tap a tool to open it.</p>
-<div class="orderbar"><button type="button" class="clrbtn" id="editOrderBtn_cat_site" onclick="toggleEditOrder('cat_site')">Edit order</button><button type="button" class="clrbtn" id="resetOrderBtn_cat_site" style="display:none" onclick="resetBubOrder('cat_site')">Reset to default</button></div>
+<p class="sub">Tap a tool to open it. Press and hold a tile to move it.</p>
+<div class="orderbar"><button type="button" class="clrbtn" id="doneOrderBtn_cat_site" style="display:none" onclick="exitJiggle('cat_site')">Done</button><button type="button" class="clrbtn" id="resetOrderBtn_cat_site" style="display:none" onclick="resetBubOrder('cat_site')">Reset to default</button></div>
 <div class="bubs">
 <div class="bub-slot" data-key="pd"><button class="bub c3" onclick="show('pd')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.5" r="7"/><path d="M12 9.7v3.8l2.9 1.7M9.8 3.5h4.4M12 3.5v3"/></svg></span><span>Pump-down Time</span></button></div>
 <div class="bub-slot" data-key="lk"><button class="bub c3" onclick="show('lk')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="5.8"/><path d="M14.7 14.7 20 20"/><path d="M10.5 7.9c1.2 1.5 1.9 2.6 1.9 3.5a1.9 1.9 0 1 1-3.8 0c0-.9.7-2 1.9-3.5Z"/></svg></span><span>Leak Check</span></button></div>
@@ -287,7 +285,7 @@ td:first-child{text-align:left;font-family:var(--sans);}
 </section><section class="page" id="learn">
 <h2>Learn the Gas Laws</h2>
 <p class="sub">Six simple rules sit under everything in this tool. Tap one to open its toy: drag the sliders and watch a box of gas particles obey the rule.</p>
-<div class="orderbar"><button type="button" class="clrbtn" id="editOrderBtn_learn" onclick="toggleEditOrder('learn')">Edit order</button><button type="button" class="clrbtn" id="resetOrderBtn_learn" style="display:none" onclick="resetBubOrder('learn')">Reset to default</button></div>
+<div class="orderbar"><button type="button" class="clrbtn" id="doneOrderBtn_learn" style="display:none" onclick="exitJiggle('learn')">Done</button><button type="button" class="clrbtn" id="resetOrderBtn_learn" style="display:none" onclick="resetBubOrder('learn')">Reset to default</button></div>
 <div class="bubs">
 <div class="bub-slot" data-key="learn_intro"><button class="bub c1" onclick="show('learn_intro')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="2.6"/><circle cx="17" cy="9.5" r="2.1"/><circle cx="11.5" cy="17" r="2.9"/><path d="M10 8.1l4.9 1M15.9 11.3l-2.9 3.4"/></svg></span><span>Start Here: What a Gas Is</span></button></div>
 <div class="bub-slot" data-key="learn_boyle"><button class="bub c1" onclick="show('learn_boyle')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12h5.5M20.5 12h-5.5"/><path d="M11.7 8.3 9 12l2.7 3.7M12.3 8.3 15 12l-2.7 3.7"/></svg></span><span>Boyle's Law</span></button></div>
@@ -4262,11 +4260,13 @@ document.addEventListener("input",recalc);
 document.addEventListener("change",recalc);
 recalc();
 
-// TOOL ORDER: lets a phone owner drag-free reorder any tool menu (Play and
-// Learn, Tools, On-Site Checks, the gas-law submenu) with up/down buttons.
-// Order is saved per device in localStorage, not shared between phones.
+// TOOL ORDER: lets a phone owner reorder any tool menu (Play and Learn,
+// Tools, On-Site Checks, the gas-law submenu) iPhone-style: press and hold
+// a tile, the others jiggle, drag it where you want, let go. Order is
+// saved per device in localStorage, not shared between phones.
 var ORDER_PAGES=["cat_learn","cat_size","cat_site","learn"];
-var EDIT_ORDER={};
+var DRAG_HOLD_MS=380,DRAG_MOVE_TOLERANCE=9;
+var DRAG=null;
 function orderKey(pid){return "bubOrder_"+pid;}
 function bubsList(pid){var sec=document.getElementById(pid);return sec?sec.querySelector(".bubs"):null;}
 function applyBubOrder(pid){
@@ -4287,43 +4287,90 @@ function resetBubOrder(pid){
  localStorage.removeItem(orderKey(pid));
  location.reload();
 }
-function toggleEditOrder(pid){
- EDIT_ORDER[pid]=!EDIT_ORDER[pid];
- renderEditOrder(pid);
+function exitJiggle(pid){
+ var list=bubsList(pid);if(list)list.classList.remove("jiggling");
+ var doneBtn=document.getElementById("doneOrderBtn_"+pid);if(doneBtn)doneBtn.style.display="none";
+ var resetBtn=document.getElementById("resetOrderBtn_"+pid);if(resetBtn)resetBtn.style.display="none";
 }
-function moveBub(pid,el,dir){
- var list=bubsList(pid);
- if(dir<0&&el.previousElementSibling)list.insertBefore(el,el.previousElementSibling);
- else if(dir>0&&el.nextElementSibling)list.insertBefore(el.nextElementSibling,el);
- saveBubOrder(pid);
- renderEditOrder(pid);
-}
-function renderEditOrder(pid){
+function wireDragReorder(pid){
  var list=bubsList(pid);if(!list)return;
- var active=!!EDIT_ORDER[pid];
- list.classList.toggle("edit-order",active);
- var items=Array.prototype.slice.call(list.children);
- items.forEach(function(el,idx){
-  var mv=el.querySelector(":scope > .mv");
-  if(active){
-   if(!mv){
-    mv=document.createElement("span");
-    mv.className="mv";
-    mv.innerHTML='<button type="button" class="mvb mvup" aria-label="Move earlier">&#8593;</button><button type="button" class="mvb mvdown" aria-label="Move later">&#8595;</button>';
-    el.appendChild(mv);
-    mv.querySelector(".mvup").onclick=function(e){e.stopPropagation();e.preventDefault();moveBub(pid,el,-1);};
-    mv.querySelector(".mvdown").onclick=function(e){e.stopPropagation();e.preventDefault();moveBub(pid,el,1);};
-   }
-   mv.querySelector(".mvup").disabled=idx===0;
-   mv.querySelector(".mvdown").disabled=idx===items.length-1;
-  }else if(mv){mv.remove();}
+ Array.prototype.forEach.call(list.children,function(slot){
+  slot.addEventListener("pointerdown",function(ev){startPress(pid,slot,ev);});
  });
- var editBtn=document.getElementById("editOrderBtn_"+pid);
- if(editBtn)editBtn.textContent=active?"Done":"Edit order";
- var resetBtn=document.getElementById("resetOrderBtn_"+pid);
- if(resetBtn)resetBtn.style.display=active?"":"none";
 }
-ORDER_PAGES.forEach(applyBubOrder);
+function startPress(pid,slot,ev){
+ if(ev.button)return;
+ if(DRAG)return;
+ var st={pid:pid,slot:slot,pointerId:ev.pointerId,startX:ev.clientX,startY:ev.clientY,armed:false};
+ st.onMove=function(mv){onPressMove(st,mv);};
+ st.onUp=function(up){endPress(st);};
+ slot.addEventListener("pointermove",st.onMove);
+ slot.addEventListener("pointerup",st.onUp);
+ slot.addEventListener("pointercancel",st.onUp);
+ st.timer=setTimeout(function(){armDrag(st);},DRAG_HOLD_MS);
+ DRAG=st;
+}
+function onPressMove(st,ev){
+ if(!st.armed){
+  var dx=ev.clientX-st.startX,dy=ev.clientY-st.startY;
+  if(Math.sqrt(dx*dx+dy*dy)>DRAG_MOVE_TOLERANCE)releasePress(st);
+  return;
+ }
+ ev.preventDefault();
+ var dx2=st.baseDX+(ev.clientX-st.moveStartX);
+ var dy2=st.baseDY+(ev.clientY-st.moveStartY);
+ st.slot.style.transform="translate("+dx2+"px,"+dy2+"px) scale(1.06)";
+ reorderUnderPointer(st,ev.clientX,ev.clientY);
+}
+function armDrag(st){
+ if(DRAG!==st)return;
+ st.armed=true;
+ try{st.slot.setPointerCapture(st.pointerId);}catch(e){}
+ var list=bubsList(st.pid);
+ list.classList.add("jiggling");
+ st.slot.classList.add("dragging");
+ st.baseDX=0;st.baseDY=0;st.moveStartX=st.startX;st.moveStartY=st.startY;
+ var doneBtn=document.getElementById("doneOrderBtn_"+st.pid);if(doneBtn)doneBtn.style.display="";
+ var resetBtn=document.getElementById("resetOrderBtn_"+st.pid);if(resetBtn)resetBtn.style.display="";
+ if(navigator.vibrate)navigator.vibrate(12);
+}
+function reorderUnderPointer(st,x,y){
+ var list=bubsList(st.pid);
+ st.slot.style.pointerEvents="none";
+ var el=document.elementFromPoint(x,y);
+ st.slot.style.pointerEvents="";
+ if(!el)return;
+ var overSlot=el.closest(".bub-slot,.tool-split");
+ if(!overSlot||overSlot===st.slot||overSlot.parentElement!==list)return;
+ var rectBefore=st.slot.getBoundingClientRect();
+ var slots=Array.prototype.slice.call(list.children);
+ var draggedIdx=slots.indexOf(st.slot),overIdx=slots.indexOf(overSlot);
+ if(draggedIdx<overIdx)list.insertBefore(st.slot,overSlot.nextSibling);
+ else list.insertBefore(st.slot,overSlot);
+ st.slot.style.transform="";
+ var rectAfter=st.slot.getBoundingClientRect();
+ st.baseDX=rectBefore.left-rectAfter.left;
+ st.baseDY=rectBefore.top-rectAfter.top;
+ st.moveStartX=x;st.moveStartY=y;
+ st.slot.style.transform="translate("+st.baseDX+"px,"+st.baseDY+"px) scale(1.06)";
+}
+function releasePress(st){
+ clearTimeout(st.timer);
+ st.slot.removeEventListener("pointermove",st.onMove);
+ st.slot.removeEventListener("pointerup",st.onUp);
+ st.slot.removeEventListener("pointercancel",st.onUp);
+ if(DRAG===st)DRAG=null;
+}
+function endPress(st){
+ var wasArmed=st.armed;
+ releasePress(st);
+ if(wasArmed){
+  st.slot.classList.remove("dragging");
+  st.slot.style.transform="";
+  saveBubOrder(st.pid);
+ }
+}
+ORDER_PAGES.forEach(function(pid){applyBubOrder(pid);wireDragReorder(pid);});
 
 // Worked examples: real numbers, checked by hand, each one names where it comes from.
 var EX_LAW={
