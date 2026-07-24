@@ -4266,7 +4266,7 @@ recalc();
 // a tile, the others jiggle, drag it where you want, let go. Order is
 // saved per device in localStorage, not shared between phones.
 var ORDER_PAGES=["cat_learn","cat_size","cat_site","learn"];
-var DRAG_HOLD_MS=380,DRAG_MOVE_TOLERANCE=9;
+var DRAG_HOLD_MS=650,DRAG_MOVE_TOLERANCE=11;
 var DRAG=null;
 function orderKey(pid){return "bubOrder_"+pid;}
 function bubsList(pid){var sec=document.getElementById(pid);return sec?sec.querySelector(".bubs"):null;}
