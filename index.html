@@ -4310,6 +4310,11 @@ function startPress(pid,slot,ev){
  st.timer=setTimeout(function(){armDrag(st);},DRAG_HOLD_MS);
  DRAG=st;
 }
+var SCROLL_RELAY_RAF=null,SCROLL_RELAY_PENDING=0;
+function flushScrollRelay(){
+ if(SCROLL_RELAY_PENDING){window.scrollBy(0,SCROLL_RELAY_PENDING);SCROLL_RELAY_PENDING=0;}
+ SCROLL_RELAY_RAF=null;
+}
 function onPressMove(st,ev){
  if(!st.armed){
   var dx=ev.clientX-st.startX,dy=ev.clientY-st.startY;
@@ -4320,8 +4325,9 @@ function onPressMove(st,ev){
   }
   if(st.scrolling){
    ev.preventDefault();
-   window.scrollBy(0,st.lastY-ev.clientY);
+   SCROLL_RELAY_PENDING+=(st.lastY-ev.clientY);
    st.lastY=ev.clientY;
+   if(!SCROLL_RELAY_RAF)SCROLL_RELAY_RAF=requestAnimationFrame(flushScrollRelay);
   }
   return;
  }
@@ -4387,6 +4393,8 @@ function releasePress(st){
  st.slot.removeEventListener("pointermove",st.onMove);
  st.slot.removeEventListener("pointerup",st.onUp);
  st.slot.removeEventListener("pointercancel",st.onUp);
+ if(SCROLL_RELAY_RAF){cancelAnimationFrame(SCROLL_RELAY_RAF);SCROLL_RELAY_RAF=null;}
+ SCROLL_RELAY_PENDING=0;
  if(DRAG===st)DRAG=null;
 }
 function endPress(st){
