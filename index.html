@@ -52,7 +52,7 @@ h2{font-size:23px;margin:2px 0 10px;font-weight:800;}
 .tool-split::before,.tool-split::after{content:"";flex:1;border-top:3px double var(--line);}
 .orderbar{display:flex;gap:8px;margin:0 0 10px;flex-wrap:wrap;}
 .orderbar .clrbtn{margin-left:0;}
-.bub-slot,.tool-split{touch-action:pan-y;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+.bub-slot,.tool-split{touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
 .bub-slot{position:relative;transition:transform .12s ease;}
 .bub-slot.dragging{z-index:50;transition:none;box-shadow:0 10px 22px rgba(23,30,35,.3);border-radius:18px;background:rgba(255,255,255,.6);}
 .bubs.jiggling .bub-slot:not(.dragging){animation:jig .26s ease-in-out infinite;}
@@ -4301,7 +4301,7 @@ function wireDragReorder(pid){
 function startPress(pid,slot,ev){
  if(ev.button)return;
  if(DRAG)return;
- var st={pid:pid,slot:slot,pointerId:ev.pointerId,startX:ev.clientX,startY:ev.clientY,armed:false};
+ var st={pid:pid,slot:slot,pointerId:ev.pointerId,startX:ev.clientX,startY:ev.clientY,lastY:ev.clientY,armed:false,scrolling:false};
  st.onMove=function(mv){onPressMove(st,mv);};
  st.onUp=function(up){endPress(st);};
  slot.addEventListener("pointermove",st.onMove);
@@ -4313,7 +4313,16 @@ function startPress(pid,slot,ev){
 function onPressMove(st,ev){
  if(!st.armed){
   var dx=ev.clientX-st.startX,dy=ev.clientY-st.startY;
-  if(Math.sqrt(dx*dx+dy*dy)>DRAG_MOVE_TOLERANCE)releasePress(st);
+  if(!st.scrolling&&Math.sqrt(dx*dx+dy*dy)>DRAG_MOVE_TOLERANCE){
+   clearTimeout(st.timer);
+   st.scrolling=true;
+   try{st.slot.setPointerCapture(st.pointerId);}catch(e){}
+  }
+  if(st.scrolling){
+   ev.preventDefault();
+   window.scrollBy(0,st.lastY-ev.clientY);
+   st.lastY=ev.clientY;
+  }
   return;
  }
  ev.preventDefault();
