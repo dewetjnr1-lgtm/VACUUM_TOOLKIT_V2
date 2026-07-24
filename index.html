@@ -52,11 +52,12 @@ h2{font-size:23px;margin:2px 0 10px;font-weight:800;}
 .tool-split::before,.tool-split::after{content:"";flex:1;border-top:3px double var(--line);}
 .orderbar{display:flex;gap:8px;margin:0 0 10px;flex-wrap:wrap;}
 .orderbar .clrbtn{margin-left:0;}
-.bub-slot,.tool-split{touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+.bub-slot,.tool-split{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+.bub-slot .ic{touch-action:none;}
+.tool-split{touch-action:none;}
 .bub-slot{position:relative;transition:transform .12s ease;}
 .bub-slot.dragging{z-index:50;transition:none;box-shadow:0 10px 22px rgba(23,30,35,.3);border-radius:18px;background:rgba(255,255,255,.6);}
 .bubs.jiggling .bub-slot:not(.dragging){animation:jig .26s ease-in-out infinite;}
-.bubs.jiggling .bub-slot .bub{pointer-events:none;}
 @keyframes jig{0%{transform:rotate(-1.2deg);}50%{transform:rotate(1.2deg);}100%{transform:rotate(-1.2deg);}}
 .about .law{display:inline-block;margin-top:6px;background:#fff;border:1px solid var(--teal);color:var(--teal);border-radius:20px;padding:3px 11px;font-size:12.5px;font-weight:700;}
 .about{display:none;}
@@ -4295,18 +4296,19 @@ function exitJiggle(pid){
 function wireDragReorder(pid){
  var list=bubsList(pid);if(!list)return;
  Array.prototype.forEach.call(list.children,function(slot){
-  slot.addEventListener("pointerdown",function(ev){startPress(pid,slot,ev);});
+  var handle=slot.querySelector(".ic")||slot;
+  handle.addEventListener("pointerdown",function(ev){startPress(pid,slot,handle,ev);});
  });
 }
-function startPress(pid,slot,ev){
+function startPress(pid,slot,handle,ev){
  if(ev.button)return;
  if(DRAG)return;
- var st={pid:pid,slot:slot,pointerId:ev.pointerId,startX:ev.clientX,startY:ev.clientY,lastY:ev.clientY,armed:false,scrolling:false};
+ var st={pid:pid,slot:slot,handle:handle,pointerId:ev.pointerId,startX:ev.clientX,startY:ev.clientY,lastY:ev.clientY,armed:false,scrolling:false};
  st.onMove=function(mv){onPressMove(st,mv);};
  st.onUp=function(up){endPress(st);};
- slot.addEventListener("pointermove",st.onMove);
- slot.addEventListener("pointerup",st.onUp);
- slot.addEventListener("pointercancel",st.onUp);
+ handle.addEventListener("pointermove",st.onMove);
+ handle.addEventListener("pointerup",st.onUp);
+ handle.addEventListener("pointercancel",st.onUp);
  st.timer=setTimeout(function(){armDrag(st);},DRAG_HOLD_MS);
  DRAG=st;
 }
@@ -4321,7 +4323,7 @@ function onPressMove(st,ev){
   if(!st.scrolling&&Math.sqrt(dx*dx+dy*dy)>DRAG_MOVE_TOLERANCE){
    clearTimeout(st.timer);
    st.scrolling=true;
-   try{st.slot.setPointerCapture(st.pointerId);}catch(e){}
+   try{st.handle.setPointerCapture(st.pointerId);}catch(e){}
   }
   if(st.scrolling){
    ev.preventDefault();
@@ -4358,7 +4360,7 @@ document.addEventListener("touchmove",function(ev){
 function armDrag(st){
  if(DRAG!==st)return;
  st.armed=true;
- try{st.slot.setPointerCapture(st.pointerId);}catch(e){}
+ try{st.handle.setPointerCapture(st.pointerId);}catch(e){}
  var list=bubsList(st.pid);
  list.classList.add("jiggling");
  st.slot.classList.add("dragging");
@@ -4390,9 +4392,9 @@ function reorderUnderPointer(st,x,y){
 }
 function releasePress(st){
  clearTimeout(st.timer);
- st.slot.removeEventListener("pointermove",st.onMove);
- st.slot.removeEventListener("pointerup",st.onUp);
- st.slot.removeEventListener("pointercancel",st.onUp);
+ st.handle.removeEventListener("pointermove",st.onMove);
+ st.handle.removeEventListener("pointerup",st.onUp);
+ st.handle.removeEventListener("pointercancel",st.onUp);
  if(SCROLL_RELAY_RAF){cancelAnimationFrame(SCROLL_RELAY_RAF);SCROLL_RELAY_RAF=null;}
  SCROLL_RELAY_PENDING=0;
  if(DRAG===st)DRAG=null;
@@ -4408,6 +4410,10 @@ function endPress(st){
  }
 }
 ORDER_PAGES.forEach(function(pid){applyBubOrder(pid);wireDragReorder(pid);});
+document.addEventListener("click",function(ev){
+ var bubs=ev.target.closest&&ev.target.closest(".bubs");
+ if(bubs&&bubs.classList.contains("jiggling")){ev.preventDefault();ev.stopPropagation();}
+},true);
 
 // Worked examples: real numbers, checked by hand, each one names where it comes from.
 var EX_LAW={
