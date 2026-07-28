@@ -89,7 +89,7 @@ details{margin:12px 0;border:1px solid rgba(211,218,224,.7);border-radius:10px;b
 summary{cursor:pointer;padding:12px 14px;font-weight:700;font-size:14px;color:var(--teal);list-style:none;}
 summary::-webkit-details-marker{display:none;}
 summary:before{content:"+ ";font-family:var(--mono);}
-details[open] summary:before{content:"\2013 ";}
+details[open]>summary:before{content:"\2013 ";}
 .math{padding:0 14px 14px;font-size:13.5px;color:var(--soft);}
 .math code{font-family:var(--mono);background:var(--paper);padding:1px 5px;border-radius:4px;}
 table{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0;}
@@ -191,6 +191,10 @@ td:first-child{text-align:left;font-family:var(--sans);}
 #lri_rows .card>.tp-num:first-of-type{margin-top:20px;}
 .tqitem{border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin:8px 0;background:rgba(255,255,255,.55);}
 #lri_rows .tqitem .tp-num,#lri_rows .exitem .tp-num{margin-top:0;padding-top:0;border-top:0;}
+#lri_rows details.lrisec>summary.tp-num{margin-top:0;border-top:0;}
+#lri_rows details.lrisec{margin:10px 0;}
+#lri_rows .tp-vaclink{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;font-size:13px;color:var(--teal);font-weight:700;margin:0 0 8px;}
+#lri_rows .tp-vaclink .tp-go{float:right;font-weight:600;font-size:12px;color:var(--accent);text-decoration:none;}
 @media print{
  @page{margin:0;}
  body>canvas,body>header,body>main{display:none !important;}
@@ -2913,6 +2917,7 @@ var LRI_OPT_DRIVE='<option value=""></option><option value="direct">Direct coupl
 var LRI_OPT_TENSION='<option value=""></option><option value="correct">Correct</option><option value="loose">Loose</option><option value="tight">Too tight</option>'+LRI_OPT_TAIL;
 var LRI_OPT_COOLERSYS='<option value=""></option><option value="straight">Straight (once-through)</option><option value="partial">Partial recirculation</option><option value="total">Total recirculation</option>'+LRI_OPT_TAIL;
 var LRI_OPT_PRIORITY='<option value=""></option><option value="routine">No action needed &mdash; routine</option><option value="monitor">Monitor &mdash; re-check next service</option><option value="shutdown">Action at next planned shutdown</option><option value="urgent">Urgent &mdash; action now</option>'+LRI_OPT_TAIL;
+var LRI_OPT_YN='<option value=""></option><option value="yes">Yes</option><option value="no">No</option>'+LRI_OPT_TAIL;
 // Own-comment box: revealed under a select when its value is "own", so a preset-free note
 // can be typed. lriSelBlock emits the select plus its hidden companion input together.
 function lriSelBlock(id,opts){
@@ -2928,12 +2933,13 @@ var LRI_ROWCOUNT=0;
 var LRI_PHOTOS=[];
 function lriRowHTML(n){
  var p="lri_r"+n+"_";
- return '<div class="card" id="lri_row'+n+'"><h3>Pump '+n+'</h3>'+
+ return '<details class="card" id="lri_row'+n+'" open><summary>Pump '+n+'</summary><div class="lripump-body">'+
  '<div class="fld"><div class="fh"><label>Pump ID / tag</label></div><div class="ctrl"><input type="text" id="'+p+'tag" placeholder="e.g. Hogging Vacuum Pump A"></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Manufacturer</span><div class="ctrl"><input type="text" id="'+p+'make"></div></div><div class="mgf"><span class="mlab">Model</span><div class="ctrl"><input type="text" id="'+p+'model"></div></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Serial No.</span><div class="ctrl"><input type="text" id="'+p+'serial"></div></div><div class="mgf"><span class="mlab">Year of manufacture</span><div class="ctrl"><input type="number" id="'+p+'year" placeholder="number"></div></div></div>'+
  '<div class="fld"><div class="fh"><label>Max working pressure (absolute, nameplate)</label></div><div class="ctrl"><input type="number" id="'+p+'maxp_n" placeholder="number"><select id="'+p+'maxp_u" data-g="pressure" data-du="4"></select><span class="fu">abs</span></div></div>'+
- '<div class="tp-num">Seals</div>'+
+
+ '<details class="lrisec"><summary class="tp-num">Seals</summary><div class="lrisec-body">'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Type</span>'+lriSelBlock(p+'seal_type',LRI_OPT_SEALTYPE)+'</div><div class="mgf"><span class="mlab">Condition</span>'+lriSelBlock(p+'seal_cond',LRI_OPT_COND)+'</div></div>'+
  '<p style="font-size:12px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.02em;margin:8px 0 2px">Gland packing (skip if mechanical seal)</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Drip rate &mdash; as found</span><div class="ctrl"><input type="text" id="'+p+'seal_drip_before" placeholder="e.g. 50, or &lsquo;pouring&rsquo;, &lsquo;dry&rsquo;"><span class="fu">drops/min</span></div></div><div class="mgf"><span class="mlab">Drip rate &mdash; after adjustment</span><div class="ctrl"><input type="text" id="'+p+'seal_drip_after" placeholder="leave blank if not adjusted"><span class="fu">drops/min</span></div></div></div>'+
@@ -2941,34 +2947,43 @@ function lriRowHTML(n){
  '<div class="mgrid"><div class="mgf"><span class="mlab">Shaft / sleeve under packing</span>'+lriSelBlock(p+'seal_sleeve',LRI_OPT_COND3)+'</div><div class="mgf"><span class="mlab">Follower adjustment left</span>'+lriSelBlock(p+'seal_adj','<option value=""></option><option value="plenty">Plenty</option><option value="some">Some</option><option value="none">None &mdash; repack due</option>'+LRI_OPT_TAIL)+'</div></div>'+
  '<div class="fld"><div class="fh"><label>Seal notes</label></div><div class="ctrl"><textarea id="'+p+'seal_notes" rows="2" placeholder="Leakage rate, seal water flush condition..."></textarea></div></div>'+
  lriSecPhotoHTML(p+'seals','Seals')+
- '<div class="tp-num">Bearings</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Bearings</summary><div class="lrisec-body">'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Type</span>'+lriSelBlock(p+'brg_type',LRI_OPT_BRGTYPE)+'</div><div class="mgf"><span class="mlab">Condition</span>'+lriSelBlock(p+'brg_cond',LRI_OPT_COND)+'</div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Temp, drive end</span><div class="ctrl"><input type="number" id="'+p+'brg_de_temp" placeholder="number"><span class="fu">&deg;C</span></div></div><div class="mgf"><span class="mlab">Temp, non-drive end</span><div class="ctrl"><input type="number" id="'+p+'brg_nde_temp" placeholder="number"><span class="fu">&deg;C</span></div></div></div>'+
  '<p id="'+p+'brg_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Housing temperatures compare against ambient in the temperature survey below.</p>'+
  '<div class="fld"><div class="fh"><label>Bearing notes</label></div><div class="ctrl"><textarea id="'+p+'brg_notes" rows="2"></textarea></div></div>'+
  lriSecPhotoHTML(p+'brg','Bearings')+
- '<div class="tp-num">Borescope inspection of casing</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Borescope inspection of casing</summary><div class="lrisec-body">'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Internal condition of the casting &mdash; corrosion, cavitation, and any abrasion or erosion damage.</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Corrosion</span>'+lriSelBlock(p+'bore_corr',LRI_OPT_SEV)+'</div><div class="mgf"><span class="mlab">Cavitation damage</span>'+lriSelBlock(p+'bore_cav',LRI_OPT_SEV)+'</div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Abrasion / erosion damage</span>'+lriSelBlock(p+'bore_abr',LRI_OPT_SEV)+'</div><div class="mgf"></div></div>'+
  '<div class="fld"><div class="fh"><label>Borescope notes / location of damage</label></div><div class="ctrl"><textarea id="'+p+'bore_notes" rows="2"></textarea></div></div>'+
  lriSecPhotoHTML(p+'bore','Borescope')+
- '<div class="tp-num">General &amp; installation</div>'+
- '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'chk_rotation"> Rotation direction checked and correct</label></div></div>'+
- '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'chk_footbolts"> Foot &amp; hold-down bolts firmly tightened</label></div></div>'+
- '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'chk_guards"> All guards fitted and secure</label></div></div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">General &amp; installation</summary><div class="lrisec-body">'+
+ '<div class="mgrid"><div class="mgf"><span class="mlab">Rotation direction</span>'+lriSelBlock(p+'chk_rotation',LRI_OPT_YN)+'</div><div class="mgf"><span class="mlab">Foot &amp; hold-down bolts</span>'+lriSelBlock(p+'chk_footbolts',LRI_OPT_YN)+'</div></div>'+
+ '<div class="mgrid"><div class="mgf"><span class="mlab">All guards fitted and secure</span>'+lriSelBlock(p+'chk_guards',LRI_OPT_YN)+'</div><div class="mgf"></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Inlet strainer / screen</span>'+lriSelBlock(p+'chk_strainer',LRI_OPT_COND3)+'</div><div class="mgf"><span class="mlab">Flexible connections / hoses</span>'+lriSelBlock(p+'chk_hoses',LRI_OPT_COND3)+'</div></div>'+
  '<div class="fld"><div class="fh"><label>Running observations</label></div><div class="ctrl"><textarea id="'+p+'run_obs" rows="2" placeholder="Noise, leaks, anything unusual while running..."></textarea></div></div>'+
  lriSecPhotoHTML(p+'gen','General & installation')+
- '<div class="tp-num">Torque settings</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Torque settings</summary><div class="lrisec-body">'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">There\'s no single industry-standard figure for these &mdash; the spec comes from the pump or coupling maker\'s own manual. Name each item you torqued, log the value you used, and add a comment. Add a line for every bolt group; leave one blank and it won\'t print.</p>'+
  '<div id="'+p+'torq"></div>'+
  '<button class="clrbtn" onclick="lriAddTorq('+n+')" style="margin:2px 0 0">Add a torque item</button> <button class="clrbtn" onclick="lriRemoveTorq('+n+')">Remove last</button>'+
- '<div class="tp-num">Drive: coupling or V-belts</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Drive: coupling or V-belts</summary><div class="lrisec-body">'+
  '<div class="fld"><div class="fh"><label>Drive type</label></div>'+lriSelBlock(p+'drive_type',LRI_OPT_DRIVE)+'</div>'+
  '<p style="font-size:12px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.02em;margin:8px 0 2px">Coupling (skip if belt driven)</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Coupling condition</span>'+lriSelBlock(p+'coup_cond',LRI_OPT_COND)+'</div><div class="mgf"><span class="mlab">Alignment</span>'+lriSelBlock(p+'coup_align',LRI_OPT_ALIGN)+'</div></div>'+
- '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'coup_bolts"> System bolts checked, tight and torqued to spec</label></div></div>'+
+ '<div class="fld"><div class="fh"><label>System bolts checked, tight and torqued to spec</label></div>'+lriSelBlock(p+'coup_bolts',LRI_OPT_YN)+'</div>'+
  '<div class="fld"><div class="fh"><label>Coupling notes</label></div><div class="ctrl"><textarea id="'+p+'coup_notes" rows="2"></textarea></div></div>'+
  '<p style="font-size:12px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.02em;margin:8px 0 2px">V-belts (skip if direct coupled)</p>'+
  '<div class="fld"><div class="fh"><label>Belt profile &amp; number of belts</label></div><div class="ctrl"><input type="text" id="'+p+'belt_profile" placeholder="e.g. SPB x 3"></div></div>'+
@@ -2977,59 +2992,81 @@ function lriRowHTML(n){
  '<div class="mgrid"><div class="mgf"><span class="mlab">Belt span (centre to centre)</span><div class="ctrl"><input type="number" id="'+p+'belt_span" placeholder="number"><span class="fu">mm</span></div></div><div class="mgf"><span class="mlab">Deflection &mdash; as found</span><div class="ctrl"><input type="number" id="'+p+'belt_defl_before" placeholder="number"><span class="fu">mm</span></div></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Deflection &mdash; after adjustment</span><div class="ctrl"><input type="number" id="'+p+'belt_defl_after" placeholder="leave blank if not adjusted"><span class="fu">mm</span></div></div><div class="mgf"></div></div>'+
  '<p id="'+p+'belt_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in the span to get a target deflection (rule of thumb: about 16 mm per metre of span under firm thumb pressure).</p>'+
- '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'belt_guard"> Belt guard refitted and secure</label></div></div>'+
+ '<div class="fld"><div class="fh"><label>Belt guard refitted and secure</label></div>'+lriSelBlock(p+'belt_guard',LRI_OPT_YN)+'</div>'+
  '<div class="fld"><div class="fh"><label>Belt drive notes</label></div><div class="ctrl"><textarea id="'+p+'belt_notes" rows="2"></textarea></div></div>'+
  lriSecPhotoHTML(p+'drive','Drive')+
- '<div class="tp-num">Seal water cooler</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Seal water cooler</summary><div class="lrisec-body">'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Seal water system</span>'+lriSelBlock(p+'cooler_system',LRI_OPT_COOLERSYS)+'</div><div class="mgf"><span class="mlab">Cooler condition</span>'+lriSelBlock(p+'cooler_cond',LRI_OPT_COND3)+'</div></div>'+
  '<div class="fld"><div class="fh"><label>Cooler comment</label></div><div class="ctrl"><textarea id="'+p+'cooler_notes" rows="2" placeholder="Observations on the cooler and the seal water arrangement..."></textarea></div></div>'+
  lriSecPhotoHTML(p+'cooler','Seal water cooler')+
- '<div class="tp-num">Separator tank</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Separator tank</summary><div class="lrisec-body">'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Inspected by borescope only &mdash; take a photo for the record.</p>'+
  '<div class="fld"><div class="fh"><label>Internal lining condition</label></div>'+lriSelBlock(p+'sep_lining',LRI_OPT_LINING)+'</div>'+
- '<div class="fld"><div class="ctrl"><label class="chk"><input type="checkbox" id="'+p+'sep_bolts"> System bolts checked, tight and torqued to spec</label></div></div>'+
+ '<div class="fld"><div class="fh"><label>System bolts checked, tight and torqued to spec</label></div>'+lriSelBlock(p+'sep_bolts',LRI_OPT_YN)+'</div>'+
  '<div class="fld"><div class="fh"><label>Separator tank notes</label></div><div class="ctrl"><textarea id="'+p+'sep_notes" rows="2"></textarea></div></div>'+
  lriSecPhotoHTML(p+'sep','Separator tank')+
- '<div class="tp-num">Extra: temperature survey (&deg;C)</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Extra: temperature survey (&deg;C)</summary><div class="lrisec-body">'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Spot readings around the pump and up and down stream &mdash; an infrared gun is fine. Skip any point you can\'t reach.</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Ambient</span><div class="ctrl"><input type="number" id="'+p+'t_amb" placeholder="number"><span class="fu">&deg;C</span></div></div><div class="mgf"><span class="mlab">Suction line</span><div class="ctrl"><input type="number" id="'+p+'t_suc" placeholder="number"><span class="fu">&deg;C</span></div></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Discharge line</span><div class="ctrl"><input type="number" id="'+p+'t_dis" placeholder="number"><span class="fu">&deg;C</span></div></div><div class="mgf"><span class="mlab">Pump casing</span><div class="ctrl"><input type="number" id="'+p+'t_case" placeholder="number"><span class="fu">&deg;C</span></div></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Motor frame</span><div class="ctrl"><input type="number" id="'+p+'t_motor" placeholder="number"><span class="fu">&deg;C</span></div></div><div class="mgf"></div></div>'+
  '<p id="'+p+'temp_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in suction and discharge to see the temperature change across the pump.</p>'+
  lriSecPhotoHTML(p+'temp','Temperature survey')+
- '<div class="tp-num tp-link" onclick="lriGoCalc(\'mav\','+n+')" title="Open the vacuum calculator, then come back and pull the number in">Extra: vacuum performance <span class="tp-go">Open calculator &rsaquo;</span></div>'+
+ '</div></details>'+
+
+ '<details class="lrisec" id="lri_r'+n+'_secvac"><summary class="tp-num">Extra: vacuum performance</summary><div class="lrisec-body">'+
+ '<p class="tp-vaclink" onclick="lriGoCalc(\'mav\','+n+')" title="Open the vacuum calculator, then come back and pull the number in">Open the &ldquo;Deepest Vacuum You Can Pull&rdquo; calculator <span class="tp-go">Open calculator &rsaquo;</span></p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Rated duty vacuum</span><div class="ctrl"><input type="number" id="'+p+'vac_rated_n" placeholder="number"><select id="'+p+'vac_rated_u" data-g="pressure" data-du="0"></select></div></div><div class="mgf"><span class="mlab">Measured today</span><div class="ctrl"><input type="number" id="'+p+'vac_meas_n" placeholder="number"><select id="'+p+'vac_meas_u" data-g="pressure" data-du="0"></select></div></div></div>'+
  '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullMav('+n+')">Pull from vacuum calculator</button>'+
  '<p id="'+p+'vac_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in both to compare against rated duty. No nameplate figure handy? Open the vacuum calculator above, enter today\'s seal water temperature and site altitude, then come back and tap "Pull from vacuum calculator" to use that as your rated comparison point.</p>'+
  lriSecPhotoHTML(p+'vac','Vacuum performance')+
+ '</div></details>'+
+
  '<div id="'+p+'cond_wrap" style="display:none">'+
- '<div class="tp-num tp-link" onclick="lriGoCalc(\'pd\','+n+')" title="Open the pump-down time calculator, then come back and pull the number in">Extra: hogging pump-down time <span class="tp-go">Open calculator &rsaquo;</span></div>'+
+ '<details class="lrisec" id="lri_r'+n+'_secpd"><summary class="tp-num">Extra: hogging pump-down time</summary><div class="lrisec-body">'+
+ '<p class="tp-vaclink" onclick="lriGoCalc(\'pd\','+n+')" title="Open the pump-down time calculator, then come back and pull the number in">Open the pump-down time calculator <span class="tp-go">Open calculator &rsaquo;</span></p>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">How long this pump takes to hog the condenser down from atmospheric to working vacuum. A time well above expected usually means an air in-leak into the condenser shell, not the pump.</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Expected time</span><div class="ctrl"><input type="number" id="'+p+'pd_exp_n" placeholder="number"><select id="'+p+'pd_exp_u" data-g="time" data-du="0"></select></div></div><div class="mgf"><span class="mlab">Measured today</span><div class="ctrl"><input type="number" id="'+p+'pd_meas_n" placeholder="number"><select id="'+p+'pd_meas_u" data-g="time" data-du="0"></select></div></div></div>'+
  '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullPd('+n+')">Pull from pump-down calculator</button>'+
  '<p id="'+p+'pd_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in both to compare. No expected figure handy? Open the pump-down calculator above, enter the condenser shell volume, this pump\'s speed and the target vacuum, then come back and tap "Pull from pump-down calculator".</p>'+
  lriSecPhotoHTML(p+'pd','Hogging pump-down time')+
- '<div class="tp-num tp-link" onclick="lriGoCalc(\'lk\','+n+')" title="Open the leak check calculator, then come back and pull the number in">Extra: condenser air in-leakage <span class="tp-go">Open calculator &rsaquo;</span></div>'+
+ '</div></details>'+
+ '<details class="lrisec" id="lri_r'+n+'_seclk"><summary class="tp-num">Extra: condenser air in-leakage</summary><div class="lrisec-body">'+
+ '<p class="tp-vaclink" onclick="lriGoCalc(\'lk\','+n+')" title="Open the leak check calculator, then come back and pull the number in">Open the leak check calculator <span class="tp-go">Open calculator &rsaquo;</span></p>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Continuous air in-leakage through glands, expansion joints and flanges below the waterline is what the holding duty has to keep up with once the condenser is hogged down. Isolate the condenser, watch the pressure climb with the pump off, and log the rate here.</p>'+
  '<div class="fld" style="padding-top:0"><div class="fh"><label>Measured leak rate</label></div><div class="ctrl"><input type="number" id="'+p+'leak_n" placeholder="number"><select id="'+p+'leak_u" data-g="leak" data-du="0"></select></div></div>'+
  '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullLk('+n+')">Pull from leak check calculator</button>'+
  '<div class="fld"><div class="fh"><label>Leak-in notes</label></div><div class="ctrl"><textarea id="'+p+'leak_notes" rows="2" placeholder="Where checked, suspected source if found..."></textarea></div></div>'+
  lriSecPhotoHTML(p+'leak','Condenser air in-leakage')+
- '<div class="tp-num tp-link" onclick="lriGoCalc(\'vap\','+n+')" title="Open the vapour and wet gas calculator, then come back and pull the number in">Extra: condenser vapour load <span class="tp-go">Open calculator &rsaquo;</span></div>'+
+ '</div></details>'+
+ '<details class="lrisec" id="lri_r'+n+'_secvap"><summary class="tp-num">Extra: condenser vapour load</summary><div class="lrisec-body">'+
+ '<p class="tp-vaclink" onclick="lriGoCalc(\'vap\','+n+')" title="Open the vapour and wet gas calculator, then come back and pull the number in">Open the vapour and wet gas calculator <span class="tp-go">Open calculator &rsaquo;</span></p>'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">How much of the extracted flow is water vapour rather than air, at the suction temperature and measured vacuum. A high share usually points to the condenser itself running warm (cooling water side), not the vacuum pump.</p>'+
  '<div class="fld" style="padding-top:0"><div class="fh"><label>Water vapour share</label></div><div class="ctrl"><input type="number" id="'+p+'vap_pct_n" placeholder="number"><span class="fu">%</span></div></div>'+
  '<button class="clrbtn" style="margin:2px 0 0" onclick="lriPullVap('+n+')">Pull from vapour calculator</button>'+
  lriSecPhotoHTML(p+'vap','Condenser vapour load')+
+ '</div></details>'+
  '</div>'+
- '<div class="tp-num">Extra: motor current</div>'+
+
+ '<details class="lrisec"><summary class="tp-num">Extra: motor current</summary><div class="lrisec-body">'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Nameplate FLA</span><div class="ctrl"><input type="number" id="'+p+'amps_rated" placeholder="number"><span class="fu">A</span></div></div><div class="mgf"><span class="mlab">Measured running current</span><div class="ctrl"><input type="number" id="'+p+'amps_meas" placeholder="number"><span class="fu">A</span></div></div></div>'+
  '<p id="'+p+'amps_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">Fill in both to see % of full load.</p>'+
  lriSecPhotoHTML(p+'amps','Motor current')+
- '<div class="tp-num">Extra: seal water</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Extra: seal water</summary><div class="lrisec-body">'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Flow</span><div class="ctrl"><input type="number" id="'+p+'sw_flow" placeholder="number"><span class="fu">L/min</span></div></div><div class="mgf"><span class="mlab">Inlet temp</span><div class="ctrl"><input type="number" id="'+p+'sw_temp_in" placeholder="number"><span class="fu">&deg;C</span></div></div></div>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Outlet temp</span><div class="ctrl"><input type="number" id="'+p+'sw_temp_out" placeholder="number"><span class="fu">&deg;C</span></div></div><div class="mgf"></div></div>'+
  lriSecPhotoHTML(p+'sw','Seal water')+
- '<div class="tp-num">Extra: vibration (mm/s RMS)</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Extra: vibration (mm/s RMS)</summary><div class="lrisec-body">'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Take readings on the bearing housings, pump and motor, both ends, three directions. Skip what you can\'t reach.</p>'+
  '<p style="font-size:12px;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.02em;margin:8px 0 2px">Pump, drive end</p>'+
  '<div class="mgrid"><div class="mgf"><span class="mlab">Axial</span><div class="ctrl"><input type="number" id="'+p+'vib_pde_ax" placeholder="number"></div></div><div class="mgf"><span class="mlab">Horizontal</span><div class="ctrl"><input type="number" id="'+p+'vib_pde_h" placeholder="number"></div></div><div class="mgf"><span class="mlab">Vertical</span><div class="ctrl"><input type="number" id="'+p+'vib_pde_v" placeholder="number"></div></div></div>'+
@@ -3041,22 +3078,28 @@ function lriRowHTML(n){
  '<div class="mgrid"><div class="mgf"><span class="mlab">Axial</span><div class="ctrl"><input type="number" id="'+p+'vib_mnde_ax" placeholder="number"></div></div><div class="mgf"><span class="mlab">Horizontal</span><div class="ctrl"><input type="number" id="'+p+'vib_mnde_h" placeholder="number"></div></div><div class="mgf"><span class="mlab">Vertical</span><div class="ctrl"><input type="number" id="'+p+'vib_mnde_v" placeholder="number"></div></div></div>'+
  '<p id="'+p+'vib_note" style="font-size:12.5px;color:var(--soft);margin:2px 0 6px">General guidance per ISO 10816-3 vibration severity zones.</p>'+
  lriSecPhotoHTML(p+'vib','Vibration')+
- '<div class="tp-num">Add your own section</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Add your own section</summary><div class="lrisec-body">'+
  '<p style="font-size:12px;color:var(--soft);margin:0 0 6px">Anything you pick up on site that isn\'t covered above &mdash; base plate, oil level, whatever comes up. Give it a name and it appears on the printed report as its own section, exactly like the ones above. Add as many as you need; leave one blank and it simply won\'t print.</p>'+
  '<div id="lri_r'+n+'_extras"></div>'+
  '<button class="clrbtn" onclick="lriAddExtra('+n+')" style="margin:2px 0 0">Add a section</button> <button class="clrbtn" onclick="lriRemoveExtra('+n+')">Remove last</button>'+
- '<div class="tp-num">Overall</div>'+
+ '</div></details>'+
+
+ '<details class="lrisec"><summary class="tp-num">Overall</summary><div class="lrisec-body">'+
  '<div class="fld"><div class="fh"><label>Overall pump condition</label></div>'+lriSelBlock(p+'condition',LRI_OPT_COND)+'</div>'+
  '<div class="fld"><div class="fh"><label>Action priority</label></div>'+lriSelBlock(p+'priority',LRI_OPT_PRIORITY)+'</div>'+
  '<div class="fld"><div class="fh"><label>Corrective action recommended for this pump</label></div><div class="ctrl"><textarea id="'+p+'corrective" rows="3" placeholder="e.g. Replace mechanical seal; bearings within tolerance, monitor next service..."></textarea></div></div>'+
  lriSecPhotoHTML(p+'overall','Overall')+
- '</div>';
+ '</div></details>'+
+
+ '</div></details>';
 }
 // Every dropdown carries an "Own comment" option; its free-text box is stored under
 // "<selectid>_oc", so each select id here also contributes an _oc field to save/load.
 var LRI_SEL_FIELDS=["seal_type","seal_cond","seal_sleeve","seal_adj","brg_type","brg_cond",
- "bore_corr","bore_cav","bore_abr","chk_strainer","chk_hoses","drive_type","coup_cond","coup_align",
- "belt_cond","belt_tension","belt_align","belt_groove","cooler_system","cooler_cond","sep_lining","condition","priority"];
+ "bore_corr","bore_cav","bore_abr","chk_rotation","chk_footbolts","chk_guards","chk_strainer","chk_hoses","drive_type","coup_cond","coup_align","coup_bolts",
+ "belt_cond","belt_tension","belt_align","belt_groove","belt_guard","cooler_system","cooler_cond","sep_lining","sep_bolts","condition","priority"];
 function lriRowFields(n){
  var p="lri_r"+n+"_";
  var f=[p+"tag",p+"make",p+"model",p+"serial",p+"year",p+"maxp_n",p+"maxp_u",
@@ -3565,7 +3608,6 @@ function pbNumOrText(id,unit){var v=rv(id);if(v==="")return "—";return lriIsNu
 function rUnitVal(nId,uId){var n=rv(nId);return n===""?"":n+" "+rSelText(uId);}
 function rDate(id){var e=document.getElementById(id);var v=e?e.value:"";if(!v)return "";var pt=v.split("-");return pt.length===3?(pt[2]+"/"+pt[1]+"/"+pt[0]):v;}
 function rSpan(id){var e=document.getElementById(id);return e?e.textContent:"";}
-function rChkYN(id){var e=document.getElementById(id);return e&&e.checked?"Yes":"Not confirmed";}
 
 // The Busch Group logo block, cropped from the official letterhead, as a self-contained image.
 var LRI_LOGO="data:image/png;base64,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";
@@ -3875,8 +3917,8 @@ function pbDrawPump(pb,n,secNorm){
  }
  if(lriAny([p+"chk_rotation",p+"chk_footbolts",p+"chk_guards",p+"chk_strainer",p+"chk_hoses",p+"run_obs"])||pbHasPhotos(secNorm,p+"gen")){
   pbHeaderRow(pb,"General & installation");
-  pbPairRow(pb,"Rotation direction correct",rChkYN(p+"chk_rotation"),"Foot & hold-down bolts tight",rChkYN(p+"chk_footbolts"));
-  pbPairRow(pb,"All guards fitted & secure",rChkYN(p+"chk_guards"),"Inlet strainer / screen",rSelText(p+"chk_strainer"));
+  pbPairRow(pb,"Rotation direction correct",rSelText(p+"chk_rotation"),"Foot & hold-down bolts tight",rSelText(p+"chk_footbolts"));
+  pbPairRow(pb,"All guards fitted & secure",rSelText(p+"chk_guards"),"Inlet strainer / screen",rSelText(p+"chk_strainer"));
   pbPairRow(pb,"Flexible connections / hoses",rSelText(p+"chk_hoses"));
   if(rv(p+"run_obs"))pbNoteRow(pb,"Running observations: "+rv(p+"run_obs"));
   pbSecPhotos(pb,secNorm,p+"gen");
@@ -3902,12 +3944,12 @@ function pbDrawPump(pb,n,secNorm){
   pbHeaderRow(pb,"Drive"+(driveTxt?": "+driveTxt:""));
   if(lriAny([p+"coup_cond",p+"coup_align",p+"coup_bolts",p+"coup_notes"])){
    pbPairRow(pb,"Coupling condition",rSelText(p+"coup_cond"),"Alignment",rSelText(p+"coup_align"));
-   pbPairRow(pb,"System bolts torqued",rChkYN(p+"coup_bolts")+(rv(p+"coup_notes")?" — "+rv(p+"coup_notes"):""));
+   pbPairRow(pb,"System bolts torqued",rSelText(p+"coup_bolts")+(rv(p+"coup_notes")?" — "+rv(p+"coup_notes"):""));
   }
   if(lriAny([p+"belt_profile",p+"belt_cond",p+"belt_tension",p+"belt_align",p+"belt_groove",p+"belt_span",p+"belt_defl_before",p+"belt_defl_after",p+"belt_guard",p+"belt_notes"])){
    pbPairRow(pb,"Belts",rv(p+"belt_profile"),"Belt condition",rSelText(p+"belt_cond"));
    pbPairRow(pb,"Tension",rSelText(p+"belt_tension"),"Pulley alignment",rSelText(p+"belt_align"));
-   pbPairRow(pb,"Pulley groove wear",rSelText(p+"belt_groove"),"Guard refitted",rChkYN(p+"belt_guard"));
+   pbPairRow(pb,"Pulley groove wear",rSelText(p+"belt_groove"),"Guard refitted",rSelText(p+"belt_guard"));
    if(lriAny([p+"belt_span",p+"belt_defl_before",p+"belt_defl_after"]))
     pbPairRow(pb,"Span",rNum(p+"belt_span","mm")||"—","Deflection, as found / after",(rNum(p+"belt_defl_before","mm")||"—")+" / "+(rNum(p+"belt_defl_after","mm")||"—"));
    if(lriAny([p+"belt_span"]))pbNoteRow(pb,rSpan(p+"belt_note"));
@@ -3921,7 +3963,7 @@ function pbDrawPump(pb,n,secNorm){
   pbPairRow(pb,"Seal water system",rSelText(p+"cooler_system"),"Cooler condition",rSelText(p+"cooler_cond"));
   if(rv(p+"cooler_notes"))pbNoteRow(pb,"Cooler comment: "+rv(p+"cooler_notes"));
   pbSecPhotos(pb,secNorm,p+"cooler");
-  pbPairRow(pb,"Separator lining",rSelText(p+"sep_lining"),"Separator bolts torqued",rChkYN(p+"sep_bolts"));
+  pbPairRow(pb,"Separator lining",rSelText(p+"sep_lining"),"Separator bolts torqued",rSelText(p+"sep_bolts"));
   if(rv(p+"sep_notes"))pbNoteRow(pb,"Separator notes: "+rv(p+"sep_notes"));
   pbSecPhotos(pb,secNorm,p+"sep");
   pbGap(pb,3);
@@ -4054,12 +4096,18 @@ var PARENT={learn:"cat_learn",learn_intro:"learn",learn_boyle:"learn",learn_char
 var CUR="home";
 var LRI_RETURN=null;
 function lriGoCalc(calcId,n){LRI_RETURN={calc:calcId,n:n};show(calcId);}
+var LRI_CALC_SEC={mav:"secvac",pd:"secpd",lk:"seclk",vap:"secvap"};
 function goBack(){
  if(LRI_RETURN&&CUR===LRI_RETURN.calc){
-  var n=LRI_RETURN.n;LRI_RETURN=null;
+  var n=LRI_RETURN.n,calc=LRI_RETURN.calc;LRI_RETURN=null;
   show("lri");
   var row=document.getElementById("lri_row"+n);
-  if(row)setTimeout(function(){row.scrollIntoView({block:"start"});},0);
+  if(row){
+   row.open=true;
+   var secKey=LRI_CALC_SEC[calc];
+   if(secKey){var sec=document.getElementById("lri_r"+n+"_"+secKey);if(sec)sec.open=true;}
+   setTimeout(function(){row.scrollIntoView({block:"start"});},0);
+  }
   return;
  }
  show(PARENT[CUR]||"home");
